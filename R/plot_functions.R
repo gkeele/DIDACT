@@ -75,9 +75,9 @@ emptyBCPlotter <- function(){
 
 legendPlotter <- function(n, add.num=1, inbred.num=1){
   plot(NA, xlim=c(0,1), ylim=c(0,1), xlab="", ylab="", frame=F, xaxt="n", yaxt="n")
-  palette(rich.colors(n + 300))
+  palette(gplots::rich.colors(n + 300))
   x <- seq(0, 1, length = n)
-  grad.col <- rich.colors(n + 300)[-c(1:300)]
+  grad.col <- gplots::rich.colors(n + 300)[-c(1:300)]
   barplot(height=rep(0.25, n), width=1/700, density=1000, angle=90, col = grad.col, border = F, space = FALSE, axes = F, add=T)
   axis(1, at=0:(add.num+inbred.num)/(add.num+inbred.num), labels=0:(add.num+inbred.num), tick=T, cex.axis=1.2)
   text(x= 0.5, 0.35, labels="Posterior mean utility", cex=1.5)
@@ -110,7 +110,7 @@ effectPlotter <- function(add.effect, inbred.effect, x.range, y.range)
 oneParamPlotter <- function(cross.u, add.effect, inbred.effect, add.perc, inbred.perc, add.num=1, inbred.num=1, cross.label1="", cross.label2="")
 {
   x.high <- add.num + inbred.num
-  palette(rich.colors(1000))
+  palette(gplots::rich.colors(1000))
   post.mean <- mean(cross.u)
   post.median <- median(cross.u)
   bgcolor <- round(post.mean*(700/x.high) + 300)
@@ -250,7 +250,7 @@ diallelPlotter <- function(results, cross.type, pheno.name="", path=getwd(), add
 # Plotting a single variance explained
 oneVarPlotter <- function(cross.var, cross.label1="", cross.label2="")
 {
-  palette(rev(rich.colors(1000)))
+  palette(rev(gplots::rich.colors(1000)))
   post.mean <- mean(cross.var)
   post.median <- median(cross.var)
   bgcolor <- round(post.mean*10)
