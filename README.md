@@ -5,10 +5,10 @@ DIDACT
 
 DIDACT extends the [BayesDiallel model](http://valdarlab.unc.edu/software/bayesdiallel/BayesDiallel.html), a hierarchical Bayesian model of a diallel experiment, to posterior samples of specified decision theoretic utility functions that is valuable in selecting and designing follow-up experiments.
 
-**Example:** Quantitative trait loci (QTL) mapping is not possible with a diallel experiment because it consists of F_0_s and F_1_s. No recombination events have remixed the founder haplotypes, allowing an effect on some phenotype to be attributed to a segregating portion of the haplotype. However, there is still genetic information on the strain/line level. DIDACT provides an approach for attenuating the signal and uncertainty estimated from the strain-level diallel data through to follow-up mapping experiments.
+**Example:** Quantitative trait loci (QTL) mapping is not possible with a diallel experiment because it consists of F0s and F1s. No recombination events have remixed the founder haplotypes, allowing an effect on some phenotype to be attributed to a segregating portion of the haplotype. However, there is still genetic information on the strain/line level. DIDACT provides an approach for attenuating the signal and uncertainty estimated from the strain-level diallel data through to follow-up mapping experiments.
 
 Example data is included in the package. The following code serves as a simple vignette for using the package for now.
-```{r}
+```r
 library(devtools)
 install_github(“gkeele/DIDACT”)
 library(DIDACT)
