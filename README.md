@@ -10,7 +10,7 @@ DIDACT extends the [BayesDiallel model](http://valdarlab.unc.edu/software/bayesd
 Example data is included in the package. The following code serves as a simple vignette for using the package for now.
 ```r
 library(devtools)
-install_github(“gkeele/DIDACT”)
+install_github("gkeele/DIDACT")
 library(DIDACT)
 data(advia.dat)
 chgb.par <- diallel.gibbs(phenotype=Advia.dat$cHGB, sex=as.numeric(Advia.dat$is.female=="F"),
