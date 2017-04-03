@@ -223,7 +223,7 @@ oneParamPlotter <- function(cross.u, cross.type, qtl.perc, qtl.num=1, cross.labe
 ######################## Plot for all crosses
 #' @export
 diallelPlotter <- function(results, cross.type, pheno.name="", path=getwd(), qtl.num=1,
-                           strains <- c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
+                           strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
   eu.list <- results$eu
   pheno.list <- results$pheno
   var.list <- results$var
