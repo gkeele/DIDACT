@@ -197,12 +197,12 @@ oneParamPlotter <- function(cross.u, cross.type, qtl.perc, qtl.num=1, cross.labe
   total <- round(100 - total.qtl, 1)
 
   if(qtl.num == 1){
-    add.pie(z=c(qtl/100, total/100), labels=NA, x=0.5*x.high, y=0.75*y.max, radius=(3/10)*(9/10)*y.range, 
+    mapplots::add.pie(z=c(qtl/100, total/100), labels=NA, x=0.5*x.high, y=0.75*y.max, radius=(3/10)*(9/10)*y.range, 
             col=(c("gray50", "white")), cex=1.3, label.dist=1.2, border="black")
   }
   else{
     excess.qtl <- round(qtl*(qtl.num-1), 1)
-    add.pie(z=c(qtl/100, excess.qtl/100, total/100), labels=NA, x=0.5*x.high, y=0.75*y.max, radius=(3/10)*(9/10)*y.range, 
+    mapplots::add.pie(z=c(qtl/100, excess.qtl/100, total/100), labels=NA, x=0.5*x.high, y=0.75*y.max, radius=(3/10)*(9/10)*y.range, 
             col=(c("gray50", "gray50", "white")), cex=1.3, label.dist=1.2, border="black")  
   }
   legend("topright", legend=c(qtl, total), fill=c("gray50", "white"), title="% Variance", border="black", bty="n", text.col="black", cex=1.2)
