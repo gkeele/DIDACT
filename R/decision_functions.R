@@ -458,6 +458,6 @@ evaluate.experiments <- function(par.mat, n, qtl.num=1,
       names(pheno.exp.list)[pheno.counter] <- paste(rownames(pheno.list[[1]])[j], "-", colnames(pheno.list[[1]])[i], sep="")
     }
   }
-  results <- list(eu.exp.list, pheno.exp.list, var.exp.list, qtl.num, n)
+  results <- list(eu=eu.exp.list, pheno=pheno.exp.list, var=var.exp.list, qtl.num=qtl.num, n=n)
   return(results)
 }
