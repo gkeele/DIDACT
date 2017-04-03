@@ -417,8 +417,9 @@ picker <- function(mat, row, col){
 }
 
 ##################### Collapse parameter set list to experiment list
-experiment.lister.general <- function(par.mat, n, qtl.num=1, 
-                                      strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
+#' @export
+evaluate.experiments <- function(par.mat, n, qtl.num=1, 
+                                 strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
   # Using previous functions
   par.bundle <- par.cruncher.general(par.mat=par.mat, n=n, qtl.num=qtl.num, strains=strains)
   var.list <- par.bundle[[3]]
