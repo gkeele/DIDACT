@@ -13,7 +13,9 @@ library(devtools)
 install_github(“gkeele/DIDACT”)
 library(DIDACT)
 data(advia.dat)
-chgb.par <- diallel.gibbs(phenotype=Advia.dat$cHGB, sex=as.numeric(Advia.dat$is.female=="F"), 						     mother.str=Advia.dat[,1], father.str=Advia.dat[,2], n.iter=10000, burn.in=10000, 					     use.constraint=TRUE)
+chgb.par <- diallel.gibbs(phenotype=Advia.dat$cHGB, sex=as.numeric(Advia.dat$is.female=="F"),
+			  mother.str=Advia.dat[,1], father.str=Advia.dat[,2], n.iter=10000, burn.in=10000,
+			  use.constraint=TRUE)
 caterpillar.plot(chgb.par.constraint, name="chgb.contrained", full=TRUE)
 chgb.par.exp = evaluate.experiments(chgb.par.constraint, n=500, qtl.num=1)
 diallelPlotter(results= chgb.par.exp, cross.type="f2", pheno.name="chgb", qtl.num=1)
