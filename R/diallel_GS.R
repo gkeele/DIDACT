@@ -41,7 +41,7 @@ update.tau <- function(K, prior.alpha, prior.beta, par.vec)
 # Need to run this before evaluating utility
 # Gibbs sampler for diallel data
 #' @export
-diallel.gibbs <- function(phenotype, sex, is.female=T, mother.str, father.str, n.iter, burn.in, multi.chain=1, thin=1,
+diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str, n.iter, burn.in, multi.chain=1, thin=1,
                           sigma.2.starter=5, taua.starter=2, taud.starter=2, tauo.starter=2, taue.starter=2,
                           strain.reorder=c(8, 7, 4, 6, 5, 1, 3, 2), use.constraint=T)
 {
