@@ -377,7 +377,7 @@ par.cruncher.general <- function(par.mat,
   power.list <- list()
   phenotype.list <- list()
   var.list <- list()
-  pb <- txtProgressBar(min=0, max=nrow(par.mat))
+  pb <- txtProgressBar(min=0, max=nrow(par.mat), style=3)
   for(i in 1:nrow(par.mat)){
     # Makes a list of cross powers - each element of list is a power matrix for a given set of parameters from diallel.GS
     power.list[[i]] <- power.matcher.general(par.vec=par.mat[i,], n=n, qtl.num=qtl.num)
