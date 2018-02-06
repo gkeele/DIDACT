@@ -1,9 +1,12 @@
 # Plots out effect intervals for diallel data
 #' @export
-caterpillar.plot <- function(mcmc.object, name=NULL, full=FALSE){
+caterpillar.plot <- function(mcmc.object, 
+                             name=NULL, 
+                             full=FALSE,
+                             col=c("black", "blue", "deepskyblue", "green", "cyan")){
   my.colors <- c(rep("black", 3), rep("blue", 8), rep("deepskyblue", 8), rep("green", 8), rep("cyan", 28), rep("black", 5))
   # Plotting only the random effects
-  if(full == F){
+  if (!full) {
     reduced.col <- -c(1, 2, 3, 56:ncol(mcmc.object))
     mcmc.object <- mcmc.object[,reduced.col]
     my.colors <- my.colors[reduced.col]
@@ -16,8 +19,7 @@ caterpillar.plot <- function(mcmc.object, name=NULL, full=FALSE){
   median.data <- as.vector(apply(mcmc.object, 2, function(x) median(x)))
   
   titlename = strsplit(deparse(substitute(mcmc.object)), ".", fixed=T)[1]
-  if(!is.null(name))
-  {
+  if (!is.null(name)) {
     titlename=name
   }
   plot(ci95.data[1, 1:2], c(1,1), panel.first = abline(h = 1, lty = 3, col = "gray88"), 

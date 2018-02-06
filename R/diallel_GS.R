@@ -55,10 +55,10 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
   strain.names <- colnames(mom.mat)
 
   # Labels
-  add.names <- paste(strain.names, " add", sep="")
-  dom.names <- paste(strain.names, " inbred", sep="")
-  mat.names <- paste(strain.names, " mat", sep="")
-  epi.names <- rep(NA, (length(strain.names)*(length(strain.names)-1))/2)
+  add.names <- paste(strain.names, "add")
+  dom.names <- paste(strain.names, "inbred")
+  mat.names <- paste(strain.names, "mat")
+  epi.names <- paste(rep(NA, (length(strain.names)*(length(strain.names)-1))/2), "epi")
   counter <- 1
   for(m in 1:length(strain.names)){
     for(n in 1:length(strain.names)){
@@ -114,10 +114,10 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
   # Progress bar
   pb <- txtProgressBar(min=0, max=n.iter*multi.chain)
   # For multiple chains
-  if(multi.chain > 1){
+  if (multi.chain > 1) {
     chain.list <- list()
   } 
-  for(j in 1:multi.chain){
+  for (j in 1:multi.chain) {
     # Allocate memory
     p.mat <- matrix(0, n.iter, 60) # 3 fixed effects, 8 additive, 8 inbred, 8 maternal, 28 epistatic
     
