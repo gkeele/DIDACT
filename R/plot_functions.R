@@ -2,10 +2,12 @@
 #' @export
 caterpillar.plot <- function(mcmc.object, 
                              name=NULL, 
-                             include.effect.types=c("mu", "female", "add", "mat", "inbred", "epistatic", "var"),
+                             include.effect.types=c("mu", "female", "add", "mat", "inbred", "epi", "var"),
                              col=c("black", "black", "dodgerblue2", "forestgreen", "darkorange2", "darkorchid1", "black"),
-                             inbred.penalty.col="firebrick2"){
-  # Plotting only the random effects
+                             inbred.penalty.col="firebrick2",
+                             manual.limits=NULL){
+  # Processing the plotted variables
+  reorder.names <- NULL
   include.col <- rep(FALSE, ncol(mcmc.object))
   use.color <- NULL
   for (i in 1:length(include.effect.types)){
@@ -21,10 +23,10 @@ caterpillar.plot <- function(mcmc.object,
     else {
       use.color <- c(use.color, rep(col[i], sum(temp.include.col)))
     }
-    include.col <- include.col | temp.include.col
+    reorder.names <- c(reorder.names, colnames(mcmc.object)[temp.include.col])
   }
   
-  mcmc.object <- mcmc.object[,include.col]
+  mcmc.object <- mcmc.object[,reorder.names]
   num.var <- ncol(mcmc.object)
   ci95.data <- coda::HPDinterval(mcmc.object, prob=0.95)
   ci50.data <- coda::HPDinterval(mcmc.object, prob=0.50)
@@ -36,9 +38,18 @@ caterpillar.plot <- function(mcmc.object,
   if (!is.null(name)) {
     titlename=name
   }
+  
+  # Window limits
+  if (!is.null(manual.limits)) {
+    this.x.lim <- manual.limits
+  }
+  else {
+    this.x.lim <- c(min(ci95.data), max(ci95.data, na.rm=T))
+  }
+
   plot(ci95.data[1, 1:2], c(1,1), panel.first = abline(h = 1, lty = 3, col = "gray88"), 
-       type = "l", ylim = c(0, num.var+1), main = c("Caterpillar plot of parameters", paste("for ", titlename)), 
-       xlim = c(min(ci95.data), max(ci95.data, na.rm=T)), xlab = "HPD intervals of strain effects and parameters", 
+       type = "l", ylim = c(0, num.var+1), main = paste(titlename, "parameters"), 
+       xlim = this.x.lim, xlab = "HPD intervals of strain effects and model parameters", 
        ylab = "", yaxt = "n", lty=1, lwd=1, col = use.color[1], frame.plot=F)
   if (length(ci95.data[1,]) > 2){
     for (i in seq(3, length(ci95.data[1,])-1, by=2)) {
