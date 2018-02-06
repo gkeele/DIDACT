@@ -63,7 +63,7 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
   for (m in 1:length(strain.names)) {
     for (n in 1:length(strain.names)) {
       if (m > n) {
-        epi.names[counter] <- paste(strain.names[m], strain.names[n], "epi")
+        epi.names[counter] <- paste(strain.names[m], strain.names[n])
         counter <- counter + 1
       }
     }
