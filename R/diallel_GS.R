@@ -111,8 +111,11 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
 
   # Overall design matrix
   X.all <- cbind(X, add.part, inbred.part, mat.part, epi.part)
-  # Progress bar
-  pb <- txtProgressBar(min=0, max=n.iter*multi.chain, style=3)
+  if (burn.in > 0) {
+    # Progress bar
+    cat("Burn-in:\n")
+    burnin.pb <- txtProgressBar(min=0, max=burn.in, style=3)
+  }
   # For multiple chains
   if (multi.chain > 1) {
     chain.list <- list()
@@ -137,7 +140,7 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
     taue <- taue.starter
     
     # Keep track of matrix rows
-    counter <- 1
+    counter <- burnin.counter <- 1
     
     # Updating parameters
     for(i in 1:((n.iter*thin)+burn.in)){
@@ -168,10 +171,18 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
       e.index <- (4 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part)):(4 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part) + ncol(epi.part) - 1)
       taue <- update.tau(diag(ncol(epi.part)), ga.alpha, ga.beta, beta.vec[e.index])
       
+      if (i <= burn.in) {
+        # Progresses burn-in progress bar
+        setTxtProgressBar(burnin.pb, burnin.counter)
+      }
       # Keep values after burn-in
-      if(i > burn.in){
-        if((i-1-burn.in) %% thin == 0){
-          if(use.constraint){
+      if (i > burn.in) {
+        if (i == burn.in + 1) { 
+          cat("MCMC sampling:\n")
+          pb <- txtProgressBar(min=0, max=n.iter*multi.chain, style=3)
+        }
+        if ((i-1-burn.in) %% thin == 0) {
+          if (use.constraint) {
             p.mat[counter,] <- c(beta.vec[1:3], 
                                  M.add %*% beta.vec[a.index],
                                  M.inbred %*% beta.vec[i.index],
@@ -183,7 +194,7 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
             p.mat[counter,] <- c(beta.vec, sigma.2, taua, taud, tauo, taue)
           }
           counter <- counter + 1
-          # Makes a progress bar
+          # Progresses progress bar
           setTxtProgressBar(pb, counter)
         }
       }
