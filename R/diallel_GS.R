@@ -173,6 +173,7 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
       
       if (i <= burn.in) {
         # Progresses burn-in progress bar
+        burnin.counter <- burnin.counter + 1
         setTxtProgressBar(burnin.pb, burnin.counter)
       }
       # Keep values after burn-in
