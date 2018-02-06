@@ -32,7 +32,7 @@ calc.bc.effects <- function(re.cross.line,
                             other.line, 
                             par.vec, 
                             qtl.num=1,
-                            strain.order <- c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
+                            strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
   re.cross.a.effect <- par.vec[paste(re.cross.line, "add")]
   other.line.a.effect <- par.vec[paste(other.line, "add")]
   i.effect <- par.vec["inbred penalty"]
@@ -58,7 +58,7 @@ calc.rbc.effects <- function(re.cross.line,
                              mat.line, 
                              par.vec, 
                              qtl.num=1,
-                             strain.order <- c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
+                             strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
   # Determining paternal line
   if (mat.line == re.cross.line) {
     pat.line <- other.line
@@ -93,7 +93,7 @@ calc.phenotypes.f2 <- function(line.m,
                                line.p, 
                                par.vec, 
                                qtl.num=1,
-                               strain.order <- c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
+                               strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
   m.a.effect <- par.vec[paste(line.m, "add")]
   p.a.effect <- par.vec[paste(line.p, "add")]
   m.i.effect <- par.vec[paste(line.m, "inbred")]
@@ -120,7 +120,7 @@ calc.phenotypes.bc <- function(re.cross.line,
                                par.vec, 
                                qtl.num=1, 
                                cross.type="bc1",
-                               strain.order <- c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
+                               strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
   re.cross.a.effect <- par.vec[paste(re.cross.line, "add")]
   other.a.effect <- par.vec[paste(other.line, "add")]
   re.cross.i.effect <- par.vec[paste(re.cross.line, " inbred")]
@@ -152,7 +152,7 @@ calc.phenotypes.rbc <- function(re.cross.line,
                                 par.vec, 
                                 qtl.num=1, 
                                 cross.type="rbc1_1",
-                                strain.order <- c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
+                                strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
   # Determining paternal line
   if (mat.line == re.cross.line) {
     pat.line <- other.line
@@ -232,7 +232,7 @@ power.cruncher.general <- function(line.m,
 power.matcher.general <- function(par.vec, 
                                   n, 
                                   qtl.num=1, 
-                                  strains = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
+                                  strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
   # 8 founder lines of CC are default
   # Initialize data objects
   cross.names <- NULL
@@ -330,7 +330,7 @@ calc.var.exp.general <- function(line.m,
 ######################## Calculates variance explained by QTL for a given draw from the Gibbs sampler for all possible crosses
 var.matcher.general <- function(par.vec, 
                                 qtl.num=1, 
-                                strains = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
+                                strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
   # 8 founder lines of CC are default
   # Initialize data objects
   cross.names <- NULL
