@@ -1,7 +1,7 @@
 # Creates a group-identity matrix given a vector of factors
 incidence.matrix <- function(fact){
   m=diag(nlevels(fact))[fact,]
-  colnames(m)=levels(fact)
+  colnames(m) <- levels(fact)
   return(m)
 }
 # Creates constraint matrix
@@ -63,7 +63,7 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
   for (m in 1:length(strain.names)) {
     for (n in 1:length(strain.names)) {
       if (m > n) {
-        epi.names[counter] <- paste(strain.names[m], strain.names[n])
+        epi.names[counter] <- paste(strain.names[m], strain.names[n], "epi")
         counter <- counter + 1
       }
     }
@@ -91,8 +91,8 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
   mom.index <- apply(mom.mat, 1, function(x) which(x == 1))
   pop.index <- apply(pop.mat, 1, function(x) which(x == 1))
   combined.index <- cbind(mom.index, pop.index)
-  sorted.index <- t(apply(combined.index, 1, function(x) sort(x, decreasing=T)))
-  make.one <- paste(strain.names[sorted.index[,1]], strain.names[sorted.index[,2]], sep=" ")
+  sorted.index <- t(apply(combined.index, 1, function(x) sort(x, decreasing=TRUE)))
+  make.one <- paste(strain.names[sorted.index[,1]], strain.names[sorted.index[,2]], "epi")
   epi.part <- 1*(t(apply(matrix(make.one, nrow=length(make.one), ncol=1), 1, function(x) x == epi.names)))
   
   # Making constraint matrix
