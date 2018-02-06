@@ -24,24 +24,24 @@ caterpillar.plot <- function(mcmc.object, name=NULL, full=FALSE){
        type = "l", ylim = c(0, no.var+1), main = c("Caterpillar plot of parameters", paste("for ", titlename)), 
        xlim = c(min(ci95.data), max(ci95.data, na.rm=T)), xlab = "HPD intervals of strain effects and parameters", 
        ylab = "", yaxt = "n", lty=1, lwd=1, col = my.colors[1], frame.plot=F)
-  if(length(ci95.data[1,]) > 2){
-    for(i in seq(3, length(ci95.data[1,])-1, by=2)){
-      lines(ci95.data[1, c(i,i+1)], c(1,1), lty=1, lwd=1, col=my.colors[1])
+  if (length(ci95.data[1,]) > 2){
+    for (i in seq(3, length(ci95.data[1,])-1, by=2)) {
+      lines(ci95.data[1, c(i,i+1)], c(1,1), lty=1, lwd=1, col=my.colors[1], lend=2)
     }
   }
   lines(ci50.data[1, 1:2], c(1,1), lty=1, lwd=5, col=my.colors[1])
-  if(length(ci50.data[1,]) > 2){
-    for(i in seq(3, length(ci50.data[1,])-1, by=2)){
-      lines(ci50.data[1, c(i,i+1)], c(1,1), lty=1, lwd=5, col=my.colors[1])
+  if (length(ci50.data[1,]) > 2){
+    for (i in seq(3, length(ci50.data[1,])-1, by=2)) {
+      lines(ci50.data[1, c(i,i+1)], c(1,1), lty=1, lwd=5, col=my.colors[1], lend=2)
     }
   }
-  for(j in 2:no.var){
+  for (j in 2:no.var) {
     abline(h = j, lty = 3, col = "gray88")
-    for(k in seq(1, length(ci95.data[j,])-1, by=2)){
-      lines(ci95.data[j, c(k,k+1)], c(j,j), lty=1, lwd=1, col=my.colors[j])
+    for (k in seq(1, length(ci95.data[j,])-1, by=2)) {
+      lines(ci95.data[j, c(k,k+1)], c(j,j), lty=1, lwd=1, col=my.colors[j], lend=2)
     }
-    for(k in seq(1, length(ci50.data[j,])-1, by=2)){
-      lines(ci50.data[j, c(k,k+1)], c(j,j), lty=1, lwd=5, col=my.colors[j])
+    for (k in seq(1, length(ci50.data[j,])-1, by=2)) {
+      lines(ci50.data[j, c(k,k+1)], c(j,j), lty=1, lwd=5, col=my.colors[j], lend=2)
     }
   }
   points(median.data, 1:no.var, pch="l", col="white")
