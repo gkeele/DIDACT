@@ -1,7 +1,6 @@
 # Plots out effect intervals for diallel data
 #' @export
-caterpillar.plot <- function(mcmc.object, name=NULL, full=FALSE)
-{
+caterpillar.plot <- function(mcmc.object, name=NULL, full=FALSE){
   my.colors <- c(rep("black", 3), rep("blue", 8), rep("deepskyblue", 8), rep("green", 8), rep("cyan", 28), rep("black", 5))
   # Plotting only the random effects
   if(full == F){
@@ -10,8 +9,8 @@ caterpillar.plot <- function(mcmc.object, name=NULL, full=FALSE)
     my.colors <- my.colors[reduced.col]
   }
   no.var <- ncol(mcmc.object)
-  ci95.data <- HPDinterval(mcmc.object, prob=0.95)
-  ci50.data <- HPDinterval(mcmc.object, prob=0.50)
+  ci95.data <- coda::HPDinterval(mcmc.object, prob=0.95)
+  ci50.data <- coda::HPDinterval(mcmc.object, prob=0.50)
   par.names <- rownames(ci95.data)
   means.data <- as.vector(apply(mcmc.object, 2, function(x) mean(x)))
   median.data <- as.vector(apply(mcmc.object, 2, function(x) median(x)))

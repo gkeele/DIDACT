@@ -12,7 +12,9 @@ Example data is included in the package. The following code serves as a simple v
 library(devtools)
 install_github("gkeele/DIDACT")
 library(DIDACT)
-data(advia.dat)
+
+## advia.dat is a diallel data set pre-loaded in DIDACT
+
 chgb.par <- diallel.gibbs(phenotype=advia.dat$cHGB, sex=as.numeric(advia.dat$is.female=="F"),
 			  mother.str=advia.dat[,1], father.str=advia.dat[,2], n.iter=10000, burn.in=10000,
 			  use.constraint=TRUE)
