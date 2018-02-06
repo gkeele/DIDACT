@@ -60,9 +60,9 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
   mat.names <- paste(strain.names, "mat")
   epi.names <- rep(NA, (length(strain.names)*(length(strain.names)-1))/2)
   counter <- 1
-  for(m in 1:length(strain.names)){
-    for(n in 1:length(strain.names)){
-      if(m > n){
+  for (m in 1:length(strain.names)) {
+    for (n in 1:length(strain.names)) {
+      if (m > n) {
         epi.names[counter] <- paste(strain.names[m], strain.names[n], "epi")
         counter <- counter + 1
       }
@@ -176,10 +176,13 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
         burnin.counter <- burnin.counter + 1
         setTxtProgressBar(burnin.pb, burnin.counter)
       }
+      if (i == burn.in) {
+        cat("\n")
+      }
       # Keep values after burn-in
       if (i > burn.in) {
         if (i == burn.in + 1) { 
-          cat("MCMC sampling:\n")
+          cat("Saved MCMC sampling:\n")
           pb <- txtProgressBar(min=0, max=n.iter*multi.chain, style=3)
         }
         if ((i-1-burn.in) %% thin == 0) {
@@ -191,7 +194,7 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
                                  M.epi %*% beta.vec[e.index],
                                  sigma.2, taua, taud, tauo, taue)
           }
-          else{
+          else {
             p.mat[counter,] <- c(beta.vec, sigma.2, taua, taud, tauo, taue)
           }
           counter <- counter + 1
@@ -209,10 +212,10 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
   }
   
   # Return matrix or list of matrix
-  if(multi.chain > 1){
+  if (multi.chain > 1) {
     return(coda::as.mcmc.list(chain.list))
   }
-  else{
+  else {
     return(coda::as.mcmc(p.mat))
   }
 }
