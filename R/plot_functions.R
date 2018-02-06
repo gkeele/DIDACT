@@ -2,16 +2,30 @@
 #' @export
 caterpillar.plot <- function(mcmc.object, 
                              name=NULL, 
-                             full=FALSE,
-                             col=c("black", "blue", "deepskyblue", "green", "cyan")){
-  my.colors <- c(rep("black", 3), rep("blue", 8), rep("deepskyblue", 8), rep("green", 8), rep("cyan", 28), rep("black", 5))
+                             include.effect.types=c("mu", "female", "add", "mat", "inbred", "epistatic", "var"),
+                             col=c("black", "black", "dodgerblue2", "forestgreen", "darkorange2", "darkorchid1", "black"),
+                             inbred.penalty.col="firebrick2"){
   # Plotting only the random effects
-  if (!full) {
-    reduced.col <- -c(1, 2, 3, 56:ncol(mcmc.object))
-    mcmc.object <- mcmc.object[,reduced.col]
-    my.colors <- my.colors[reduced.col]
+  include.col <- rep(FALSE, ncol(mcmc.object))
+  use.color <- NULL
+  for (i in 1:length(include.effect.types)){
+    if (include.effect.types[i] == "var") {
+      temp.include.col <- grepl(x=colnames(mcmc.object), pattern="tau|sigma")
+    }
+    else {
+      temp.include.col <- grepl(x=colnames(mcmc.object), pattern=include.effect.types[i]) & !grepl(x=colnames(mcmc.object), pattern="tau|sigma")
+    }
+    if (include.effect.types[i] == "inbred") {
+      use.color <- c(use.color, c(inbred.penalty.col, rep(col[i], sum(temp.include.col) - 1)))
+    }
+    else {
+      use.color <- c(use.color, rep(col[i], sum(temp.include.col)))
+    }
+    include.col <- include.col | temp.include.col
   }
-  no.var <- ncol(mcmc.object)
+  
+  mcmc.object <- mcmc.object[,include.col]
+  num.var <- ncol(mcmc.object)
   ci95.data <- coda::HPDinterval(mcmc.object, prob=0.95)
   ci50.data <- coda::HPDinterval(mcmc.object, prob=0.50)
   par.names <- rownames(ci95.data)
@@ -23,33 +37,33 @@ caterpillar.plot <- function(mcmc.object,
     titlename=name
   }
   plot(ci95.data[1, 1:2], c(1,1), panel.first = abline(h = 1, lty = 3, col = "gray88"), 
-       type = "l", ylim = c(0, no.var+1), main = c("Caterpillar plot of parameters", paste("for ", titlename)), 
+       type = "l", ylim = c(0, num.var+1), main = c("Caterpillar plot of parameters", paste("for ", titlename)), 
        xlim = c(min(ci95.data), max(ci95.data, na.rm=T)), xlab = "HPD intervals of strain effects and parameters", 
-       ylab = "", yaxt = "n", lty=1, lwd=1, col = my.colors[1], frame.plot=F)
+       ylab = "", yaxt = "n", lty=1, lwd=1, col = use.color[1], frame.plot=F)
   if (length(ci95.data[1,]) > 2){
     for (i in seq(3, length(ci95.data[1,])-1, by=2)) {
-      lines(ci95.data[1, c(i,i+1)], c(1,1), lty=1, lwd=1, col=my.colors[1], lend=2)
+      lines(ci95.data[1, c(i,i+1)], c(1,1), lty=1, lwd=1, col=use.color[1], lend=2)
     }
   }
-  lines(ci50.data[1, 1:2], c(1,1), lty=1, lwd=5, col=my.colors[1])
+  lines(ci50.data[1, 1:2], c(1,1), lty=1, lwd=5, col=use.color[1])
   if (length(ci50.data[1,]) > 2){
     for (i in seq(3, length(ci50.data[1,])-1, by=2)) {
-      lines(ci50.data[1, c(i,i+1)], c(1,1), lty=1, lwd=5, col=my.colors[1], lend=2)
+      lines(ci50.data[1, c(i,i+1)], c(1,1), lty=1, lwd=3, col=use.color[1], lend=2)
     }
   }
-  for (j in 2:no.var) {
+  for (j in 2:num.var) {
     abline(h = j, lty = 3, col = "gray88")
     for (k in seq(1, length(ci95.data[j,])-1, by=2)) {
-      lines(ci95.data[j, c(k,k+1)], c(j,j), lty=1, lwd=1, col=my.colors[j], lend=2)
+      lines(ci95.data[j, c(k,k+1)], c(j,j), lty=1, lwd=1, col=use.color[j], lend=2)
     }
     for (k in seq(1, length(ci50.data[j,])-1, by=2)) {
-      lines(ci50.data[j, c(k,k+1)], c(j,j), lty=1, lwd=5, col=my.colors[j], lend=2)
+      lines(ci50.data[j, c(k,k+1)], c(j,j), lty=1, lwd=3, col=use.color[j], lend=2)
     }
   }
-  points(median.data, 1:no.var, pch="l", col="white")
-  points(means.data, 1:no.var, pch="l", col=my.colors)
-  abline(v=0, lty=2, col="red")
-  axis(2, c(1:no.var), par.names, c(1:no.var), las = 2, tck = -0.005, cex.axis = 0.5)
+  points(median.data, 1:num.var, pch="l", col="white")
+  points(means.data, 1:num.var, pch="l", col=use.color)
+  abline(v=0, lty=2, col="gray")
+  axis(2, c(1:num.var), par.names, c(1:num.var), las = 2, tck = -0.005, cex.axis = 0.5)
 }
 
 ################## Component plots of Moonrise plot

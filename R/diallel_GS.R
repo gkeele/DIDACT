@@ -203,7 +203,9 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
         }
       }
     }
-    colnames(p.mat) <- c("mu", "female", "inbred", add.names, dom.names, mat.names, epi.names, "sigma2", "tau2 add", "tau2 inbred", "tau2 mat", "tau2 epi")
+    colnames(p.mat) <- c("mu", "female", "inbred penalty", 
+                         add.names, dom.names, mat.names, epi.names, 
+                         "sigma2", "tau2 add", "tau2 inbred", "tau2 mat", "tau2 epi")
     
     # If multiple chains, build up list
     if(multi.chain > 1){
