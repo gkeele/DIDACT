@@ -112,7 +112,7 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
   # Overall design matrix
   X.all <- cbind(X, add.part, inbred.part, mat.part, epi.part)
   # Progress bar
-  pb <- txtProgressBar(min=0, max=n.iter*multi.chain)
+  pb <- txtProgressBar(min=0, max=n.iter*multi.chain, style=3)
   # For multiple chains
   if (multi.chain > 1) {
     chain.list <- list()
