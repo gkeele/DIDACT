@@ -3,7 +3,7 @@ calc.f2.effects <- function(line.m,
                             line.p, 
                             par.vec, 
                             qtl.num=1,
-                            strains=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
+                            strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
   m.a.effect <- par.vec[paste(line.m, "add")]
   p.a.effect <- par.vec[paste(line.p, "add")]
   i.effect <- par.vec["inbred penalty"]
