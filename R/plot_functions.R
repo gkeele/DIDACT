@@ -272,7 +272,6 @@ diallelPlotter <- function(results,
                            path=NULL,
                            height=12,
                            width=12,
-                           qtl.num=1,
                            strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
   cross.type <- cross.type[1]
   eu.list <- results$eu
