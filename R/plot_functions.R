@@ -79,7 +79,7 @@ caterpillar.plot <- function(mcmc.object,
 
 ################## Component plots of Moonrise plot
 emptyPlotter <- function(...){
-  plot(x=1,y=1, cex = 50, pch = 4, xlab = "", ylab = "",
+  plot(x=1, y=1, cex = 50, pch = 4, xlab = "", ylab = "",
        frame.plot = FALSE, xaxt = "n", yaxt = "n")
 }
 
@@ -91,8 +91,12 @@ emptyF2Plotter <- function(background){
   text(0, -2, labels=paste(background, " (A)", sep=""), cex=2)
 }
 
-bclegendPlotter <- function(background, trait, n, n.color, qtl.num=1){
-  plot(NA, xlim=c(0,1), ylim=c(0,1), xlab="", ylab="", frame=F, xaxt="n", yaxt="n")
+bclegendPlotter <- function(background, 
+                            trait, 
+                            n, 
+                            n.color, 
+                            qtl.num=1){
+  plot(NA, xlim=c(0,1), ylim=c(0,1), xlab="", ylab="", frame=FALSE, xaxt="n", yaxt="n")
   
   text(x=0, y=1, labels=paste("Trait: ", trait, sep=""), adj=0, cex=1.2)
   text(x=0, y=0.9, labels=paste("QTL number: ", qtl.num, sep=""), adj=0, cex=1.2)
@@ -116,7 +120,7 @@ emptyBCPlotter <- function(background){
   plot(x=1,y=1, cex = 1, pch ="", xlab = "", ylab = "", xlim=c(-10, 10), ylim=c(-10,10),
        frame.plot = FALSE, xaxt = "n", yaxt = "n", col="white")
   arrows(5, 0, -5, 0, length=0.1)
-  text(0, -3, labels=paste("Background: ",background, " (A)", sep=""), cex=1.5)
+  text(0, -3, labels=paste("Background: ", background, " (A)", sep=""), cex=1.5)
 }
 
 emptyRBC1Plotter <- function(background){
@@ -124,7 +128,7 @@ emptyRBC1Plotter <- function(background){
        frame.plot = FALSE, xaxt = "n", yaxt = "n", col="white")
   arrows(-3, 7.5, 3, 7.5, length=0.1)
   arrows(-3, 7.5, -3, 1.5, length=0.1)
-  text(0, 9.5, paste("Background: ",background, " (A)", sep=""), cex=1.5)
+  text(0, 9.5, paste("Background: ", background, " (A)", sep=""), cex=1.5)
   
   arrows(3, -6, -3 , -6, length=0.1)
   text(0, -8, "Maternal Strain", cex=1.5)
@@ -181,7 +185,11 @@ f2boxPlotter <- function(homo1.vec, homo2.vec, hetero.vec, y.max, x.max){
   text(x=mid.x+(1/2)*shift.x, y=2*y.max-(1/15)*y.max, labels="Phenotypes", cex=1.1)
 }
 
-bcboxPlotter <- function(homo.vec, hetero.vec, y.max, x.max, back.allele="A"){
+bcboxPlotter <- function(homo.vec, 
+                         hetero.vec, 
+                         y.max, 
+                         x.max, 
+                         back.allele="A"){
   max.box.y <- max(homo.vec, hetero.vec, na.rm=TRUE)
   min.box.y <- min(homo.vec, hetero.vec, na.rm=TRUE)
   box.y.range <- max.box.y - min.box.y
@@ -203,8 +211,16 @@ bcboxPlotter <- function(homo.vec, hetero.vec, y.max, x.max, back.allele="A"){
   text(x=mid.x+(1/2)*shift.x, y=2*y.max-(1/15)*y.max, labels="Phenotypes", cex=1.1)
 }
 
-oneParamPlotter <- function(cross.u, cross.type, qtl.perc, qtl.num=1, cross.label1="", cross.label2="",
-                            homo1.vec, homo2.vec=NULL, hetero.vec, back.allele=NULL){
+oneParamPlotter <- function(cross.u, 
+                            cross.type, 
+                            qtl.perc, 
+                            qtl.num=1, 
+                            cross.label1="", 
+                            cross.label2="",
+                            homo1.vec, 
+                            homo2.vec=NULL, 
+                            hetero.vec, 
+                            back.allele=NULL){
   x.high <- qtl.num
   palette(gplots::rich.colors(1000))
   post.mean <- mean(cross.u)
@@ -253,7 +269,9 @@ oneParamPlotter <- function(cross.u, cross.type, qtl.perc, qtl.num=1, cross.labe
 diallelPlotter <- function(results, 
                            cross.type=c("f2", "bc", "rbc1", "rbc2"), 
                            pheno.name="", 
-                           path="~/", 
+                           path=NULL,
+                           height=12,
+                           width=12,
                            qtl.num=1,
                            strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
   cross.type <- cross.type[1]
@@ -267,11 +285,7 @@ diallelPlotter <- function(results,
   if(pheno.name==""){
     pheno.name <- strsplit(deparse(substitute(eu.list)), split=".", fixed=T)[[1]][1]
   }
-  if(qtl.num == 1){
-    pdf(paste(path,"/Diallel_", pheno.name, "_", cross.type, ".pdf",sep = ""),
-        width=12, height = 12)
-  }
-  else{
+  if (!is.null(path)) {
     pdf(paste(path,"/Diallel_", pheno.name, "_", cross.type, "_", qtl.num, "qtl", sep = ""),
         width=12, height = 12)    
   }
@@ -386,6 +400,8 @@ diallelPlotter <- function(results,
       }
     }
   } 
-  dev.off()
+  if (!is.null(path)) {
+    dev.off()
+  }
 }
 
