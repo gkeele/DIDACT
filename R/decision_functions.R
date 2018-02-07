@@ -233,14 +233,13 @@ power.matcher.general <- function(par.vec,
                                   n, 
                                   qtl.num=1, 
                                   strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
-  # 8 founder lines of CC are default
   # Initialize data objects
   cross.names <- NULL
   powers <- NULL
   strain.matrix <- NULL
   mover <- 2 # Keeps inbred (NZOxNZO) and identical (NZOxB6 and B6xNZ) crosses from occurring
-  for(i in 1:(length(strains)-1)){
-    for(j in mover:length(strains)){
+  for (i in 1:(length(strains)-1)) {
+    for (j in mover:length(strains)) {
       # Cross types
       bc.cross1 <- power.cruncher.general(line.m=strains[i], line.p=strains[j], cross.type="bc", par.vec=par.vec, n=n, re.cross=strains[i], qtl.num=qtl.num)
       rbc.cross1_1 <- power.cruncher.general(line.m=strains[i], line.p=strains[j], cross.type="rbc", par.vec=par.vec, n=n, re.cross=strains[i], mat.line=strains[i], qtl.num=qtl.num)
@@ -270,18 +269,18 @@ calc.var.exp.general <- function(line.m,
                                  re.cross=NULL, 
                                  mat.line=NULL, 
                                  qtl.num=1){
-  if(cross.type == "f2"){
+  if (cross.type == "f2") {
     effects <- calc.f2.effects(line.m=line.m, line.p=line.p, par.vec=par.vec, qtl.num=qtl.num)
     qtl.var <- (1/2)*effects[1]^2 + (1/4)*effects[2]^2
     
     phenotypes <- calc.phenotypes.f2(line.m=line.m, line.p=line.p, par.vec=par.vec, qtl.num=qtl.num)
   }
-  else if (cross.type == "bc"){
-    if(re.cross == line.m){
+  else if (cross.type == "bc") {
+    if (re.cross == line.m) {
       other.line <- line.p
       type <- "bc1"
     }
-    else{
+    else {
       other.line <- line.m
       type <- "bc2"
     }
@@ -290,19 +289,19 @@ calc.var.exp.general <- function(line.m,
     
     phenotypes <- calc.phenotypes.bc(re.cross.line=re.cross, other.line=other.line, par.vec=par.vec, qtl.num=qtl.num, cross.type=type)
   }
-  else if(cross.type == "rbc"){
-    if(re.cross == line.m){
+  else if (cross.type == "rbc") {
+    if (re.cross == line.m) {
       other.line <- line.p
-      if(mat.line == line.m){
+      if (mat.line == line.m) {
         type <- "rbc1_1"
       }
-      else{
+      else {
         type <- "rbc1_2"
       }
     }
-    else{
+    else {
       other.line <- line.m
-      if(mat.line == line.m){
+      if (mat.line == line.m) {
         type <- "rbc2_1"
       }
       else{
@@ -338,8 +337,8 @@ var.matcher.general <- function(par.vec,
   var.matrix <- NULL
   phenotype.matrix <- NULL
   mover <- 2 # Keeps inbred (NZOxNZO) and identical (NZOxB6 and B6xNZ) crosses from occurring
-  for(i in 1:(length(strains)-1)){
-    for(j in mover:length(strains)){
+  for (i in 1:(length(strains)-1)) {
+    for (j in mover:length(strains)) {
       # Cross types
       bc.cross1 <- calc.var.exp.general(line.m=strains[i], line.p=strains[j], cross.type="bc", par.vec=par.vec, re.cross=strains[i], qtl.num=qtl.num)
       rbc.cross1_1 <- calc.var.exp.general(line.m=strains[i], line.p=strains[j], cross.type="rbc", par.vec=par.vec, re.cross=strains[i], mat.line=strains[i], qtl.num=qtl.num)
@@ -378,7 +377,7 @@ par.cruncher.general <- function(par.mat,
   phenotype.list <- list()
   var.list <- list()
   pb <- txtProgressBar(min=0, max=nrow(par.mat), style=3)
-  for(i in 1:nrow(par.mat)){
+  for (i in 1:nrow(par.mat)) {
     # Makes a list of cross powers - each element of list is a power matrix for a given set of parameters from diallel.GS
     power.list[[i]] <- power.matcher.general(par.vec=par.mat[i,], n=n, qtl.num=qtl.num)
     eff.var.list <- var.matcher.general(par.vec=par.mat[i,], qtl.num=qtl.num)
@@ -396,7 +395,7 @@ par.cruncher.general <- function(par.mat,
 utility.calculator.general <- function(power.mat, col, qtl.num=1){
   c.matrix <- matrix(nrow=nrow(power.mat), ncol=qtl.num+1)
   total <- qtl.num
-  for(i in 0:total){
+  for (i in 0:total) {
     p <- log(choose(total, i)) + i*log(power.mat[,col] + 5e-324) + (total-i)*log(1 - power.mat[,col] + 5e-324)
     c.matrix[,i+1] <- exp(p)
     cross.names <- rownames(power.mat)

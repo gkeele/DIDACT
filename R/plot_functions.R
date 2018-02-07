@@ -141,7 +141,10 @@ emptyRBC2Plotter <- function(background){
   text(0, -8, "Maternal Strain", cex=1.5)
 }
 
-legendPlotter <- function(trait, n, n.color, qtl.num=1){
+legendPlotter <- function(trait, 
+                          n, 
+                          n.color, 
+                          qtl.num=1){
   plot(NA, xlim=c(0,1), ylim=c(0,1), xlab="", ylab="", frame=F, xaxt="n", yaxt="n")
   
   text(x=0, y=1, labels=paste("Trait: ", trait, sep=""), adj=0, cex=1.2)
@@ -159,8 +162,7 @@ legendPlotter <- function(trait, n, n.color, qtl.num=1){
          title="Variation type", cex=1.3, pt.cex=1.3)
 }
 
-f2boxPlotter <- function(homo1.vec, homo2.vec, hetero.vec, y.max, x.max)
-{
+f2boxPlotter <- function(homo1.vec, homo2.vec, hetero.vec, y.max, x.max){
   max.box.y <- max(homo1.vec, homo2.vec, hetero.vec)
   min.box.y <- min(homo1.vec, homo2.vec, hetero.vec)
   box.y.range <- max.box.y - min.box.y
@@ -280,7 +282,7 @@ diallelPlotter <- function(results,
       if(cross.type == "f2"){
         if(i == j){
           if(i == length(strains)){
-            legendPlotter(trait=pheno.name, n=700, n.color=700, qtl.num=qtl.num)
+            legendPlotter(trait=pheno.name, n=n, n.color=700, qtl.num=qtl.num)
           }
           else{
             emptyF2Plotter(background=strains[i])
