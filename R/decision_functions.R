@@ -123,7 +123,7 @@ calc.phenotypes.bc <- function(re.cross.line,
                                strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
   re.cross.a.effect <- par.vec[paste(re.cross.line, "add")]
   other.a.effect <- par.vec[paste(other.line, "add")]
-  re.cross.i.effect <- par.vec[paste(re.cross.line, " inbred")]
+  re.cross.i.effect <- par.vec[paste(re.cross.line, "inbred")]
   # Epistatic effects
   re.cross.index <- which(re.cross.line == strain.order)
   other.index <- which(other.line == strain.order)
@@ -137,10 +137,10 @@ calc.phenotypes.bc <- function(re.cross.line,
   homo.re <- par.vec["mu"] + 2*re.cross.a.effect + par.vec["inbred penalty"] + re.cross.i.effect
   hetero <- par.vec["mu"] + re.cross.a.effect + other.a.effect + e.effect
   phenos <- cbind(homo.re, hetero)
-  if(cross.type=="bc1"){
+  if (cross.type == "bc1") {
     colnames(phenos) <- c("bc1-hom", "bc1-het")
   }
-  else{
+  else {
     colnames(phenos) <- c("bc2-hom", "bc2-het")
   }
   return(phenos)

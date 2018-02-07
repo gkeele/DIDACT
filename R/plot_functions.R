@@ -256,10 +256,18 @@ oneParamPlotter <- function(cross.u,
     text(1, median(dens$y), paste(cross.label1, 'x', cross.label2, sep=""))
   }
   if(cross.type=="f2"){
-    f2boxPlotter(homo1.vec=homo1.vec, homo2.vec=homo2.vec, hetero.vec=hetero.vec, y.max=max.y, x.max=x.high)
+    f2boxPlotter(homo1.vec=homo1.vec, 
+                 homo2.vec=homo2.vec, 
+                 hetero.vec=hetero.vec, 
+                 y.max=max.y, 
+                 x.max=x.high)
   }
   else if(cross.type=="bc"){
-    bcboxPlotter(homo.vec=homo1.vec, hetero.vec=hetero.vec, y.max=max.y, x.max=x.high, back.allele=back.allele)
+    bcboxPlotter(homo.vec=homo1.vec, 
+                 hetero.vec=hetero.vec, 
+                 y.max=max.y, 
+                 x.max=x.high, 
+                 back.allele=back.allele)
   }
   axis(1, at=0:x.high, labels=T, tick=T, cex.axis=1.2)
 }
