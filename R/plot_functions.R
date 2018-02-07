@@ -44,7 +44,7 @@ caterpillar.plot <- function(mcmc.object,
     this.x.lim <- manual.limits
   }
   else {
-    this.x.lim <- c(min(ci95.data), max(ci95.data, na.rm=T))
+    this.x.lim <- c(min(ci95.data, na.rm=TRUE), max(ci95.data, na.rm=TRUE))
   }
 
   plot(ci95.data[1, 1:2], c(1,1), panel.first = abline(h = 1, lty = 3, col = "gray88"), 
@@ -163,8 +163,8 @@ legendPlotter <- function(trait,
 }
 
 f2boxPlotter <- function(homo1.vec, homo2.vec, hetero.vec, y.max, x.max){
-  max.box.y <- max(homo1.vec, homo2.vec, hetero.vec)
-  min.box.y <- min(homo1.vec, homo2.vec, hetero.vec)
+  max.box.y <- max(homo1.vec, homo2.vec, hetero.vec, na.rm=TRUE)
+  min.box.y <- min(homo1.vec, homo2.vec, hetero.vec, na.rm=TRUE)
   box.y.range <- max.box.y - min.box.y
   # Scaling and rescaling
   homo1.vec.sc <- (homo1.vec - min.box.y)*(y.max*(3/5)/(max.box.y-min.box.y)) + y.max*(5/4)
@@ -182,8 +182,8 @@ f2boxPlotter <- function(homo1.vec, homo2.vec, hetero.vec, y.max, x.max){
 }
 
 bcboxPlotter <- function(homo.vec, hetero.vec, y.max, x.max, back.allele="A"){
-  max.box.y <- max(homo.vec, hetero.vec)
-  min.box.y <- min(homo.vec, hetero.vec)
+  max.box.y <- max(homo.vec, hetero.vec, na.rm=TRUE)
+  min.box.y <- min(homo.vec, hetero.vec, na.rm=TRUE)
   box.y.range <- max.box.y - min.box.y
   # Scaling and rescaling
   homo.vec.sc <- (homo.vec - min.box.y)*(y.max*(4/7)/(max.box.y-min.box.y)) + y.max*(4/3)
