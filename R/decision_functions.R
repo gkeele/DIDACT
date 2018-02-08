@@ -200,10 +200,11 @@ power.cruncher.general <- function(line.m,
                                    n, 
                                    re.cross=NULL, 
                                    mat.line=NULL, 
-                                   qtl.num=1){
+                                   qtl.num=1,
+                                   strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
   # Power calculation
   if(cross.type == "f2"){
-    f2.effects <- calc.f2.effects(line.m=line.m, line.p=line.p, par.vec=par.vec, qtl.num=qtl.num)
+    f2.effects <- calc.f2.effects(line.m=line.m, line.p=line.p, par.vec=par.vec, qtl.num=qtl.num, strain.order=rev(strains))
     power.val <- qtlDesign::powercalc(cross=cross.type, n=n, effect=f2.effects, sigma2=par.vec["sigma2"])[1]
   }
   else if (cross.type == "bc") {
@@ -213,7 +214,7 @@ power.cruncher.general <- function(line.m,
     else{
       other.line <- line.m
     }
-    bc.effects <- calc.bc.effects(re.cross.line=re.cross, other.line=other.line, par.vec=par.vec, qtl.num=qtl.num)
+    bc.effects <- calc.bc.effects(re.cross.line=re.cross, other.line=other.line, par.vec=par.vec, qtl.num=qtl.num, strain.order=rev(strains))
     power.val <- qtlDesign::powercalc(cross=cross.type, n=n, effect=bc.effects, sigma2=par.vec["sigma2"])[1]
   }
   else if(cross.type == "rbc"){
@@ -223,7 +224,7 @@ power.cruncher.general <- function(line.m,
     else{
       other.line <- line.m
     }
-    rbc.effects <- calc.rbc.effects(re.cross.line=re.cross, other.line=other.line, mat.line=mat.line, par.vec=par.vec, qtl.num=qtl.num)
+    rbc.effects <- calc.rbc.effects(re.cross.line=re.cross, other.line=other.line, mat.line=mat.line, par.vec=par.vec, qtl.num=qtl.num, strain.order=rev(strains))
     power.val <- qtlDesign::powercalc(cross="bc", n=n, effect=rbc.effects, sigma2=par.vec["sigma2"])[1]
   }
   return(power.val)
@@ -241,13 +242,65 @@ power.matcher.general <- function(par.vec,
   for (i in 1:(length(strains)-1)) {
     for (j in mover:length(strains)) {
       # Cross types
-      bc.cross1 <- power.cruncher.general(line.m=strains[i], line.p=strains[j], cross.type="bc", par.vec=par.vec, n=n, re.cross=strains[i], qtl.num=qtl.num)
-      rbc.cross1_1 <- power.cruncher.general(line.m=strains[i], line.p=strains[j], cross.type="rbc", par.vec=par.vec, n=n, re.cross=strains[i], mat.line=strains[i], qtl.num=qtl.num)
-      rbc.cross1_2 <- power.cruncher.general(line.m=strains[i], line.p=strains[j], cross.type="rbc", par.vec=par.vec, n=n, re.cross=strains[i], mat.line=strains[j], qtl.num=qtl.num)      
-      bc.cross2 <- power.cruncher.general(line.m=strains[i], line.p=strains[j], cross.type="bc", par.vec=par.vec, n=n, re.cross=strains[j], qtl.num=qtl.num)
-      rbc.cross2_1 <- power.cruncher.general(line.m=strains[i], line.p=strains[j], cross.type="rbc", par.vec=par.vec, n=n, re.cross=strains[j], mat.line=strains[i], qtl.num=qtl.num)
-      rbc.cross2_2 <- power.cruncher.general(line.m=strains[i], line.p=strains[j], cross.type="rbc", par.vec=par.vec, n=n, re.cross=strains[j], mat.line=strains[j], qtl.num=qtl.num)
-      f2.cross <- power.cruncher.general(line.m=strains[i], line.p=strains[j], cross.type="f2", par.vec=par.vec, n=n, qtl.num=qtl.num)
+      bc.cross1 <- power.cruncher.general(line.m=strains[i], 
+                                          line.p=strains[j], 
+                                          cross.type="bc", 
+                                          par.vec=par.vec, 
+                                          n=n, 
+                                          re.cross=strains[i], 
+                                          qtl.num=qtl.num, 
+                                          strains=strains)
+      rbc.cross1_1 <- power.cruncher.general(line.m=strains[i], 
+                                             line.p=strains[j], 
+                                             cross.type="rbc",
+                                             par.vec=par.vec, 
+                                             n=n, 
+                                             re.cross=strains[i], 
+                                             mat.line=strains[i], 
+                                             qtl.num=qtl.num, 
+                                             strains=strains)
+      rbc.cross1_2 <- power.cruncher.general(line.m=strains[i], 
+                                             line.p=strains[j], 
+                                             cross.type="rbc", 
+                                             par.vec=par.vec, 
+                                             n=n, 
+                                             re.cross=strains[i], 
+                                             mat.line=strains[j], 
+                                             qtl.num=qtl.num, 
+                                             strains=strains)      
+      bc.cross2 <- power.cruncher.general(line.m=strains[i], 
+                                          line.p=strains[j], 
+                                          cross.type="bc", 
+                                          par.vec=par.vec, 
+                                          n=n, 
+                                          re.cross=strains[j], 
+                                          qtl.num=qtl.num, 
+                                          strains=strains)
+      rbc.cross2_1 <- power.cruncher.general(line.m=strains[i], 
+                                             line.p=strains[j], 
+                                             cross.type="rbc", 
+                                             par.vec=par.vec, 
+                                             n=n, 
+                                             re.cross=strains[j], 
+                                             mat.line=strains[i], 
+                                             qtl.num=qtl.num, 
+                                             strains=strains)
+      rbc.cross2_2 <- power.cruncher.general(line.m=strains[i], 
+                                             line.p=strains[j], 
+                                             cross.type="rbc", 
+                                             par.vec=par.vec, 
+                                             n=n, 
+                                             re.cross=strains[j], 
+                                             mat.line=strains[j], 
+                                             qtl.num=qtl.num, 
+                                             strains=strains)
+      f2.cross <- power.cruncher.general(line.m=strains[i], 
+                                         line.p=strains[j], 
+                                         cross.type="f2", 
+                                         par.vec=par.vec, 
+                                         n=n, 
+                                         qtl.num=qtl.num, 
+                                         strains=strains)
       
       # Processing output
       cross.names <- paste(strains[i], "x", strains[j], sep="")
@@ -268,12 +321,21 @@ calc.var.exp.general <- function(line.m,
                                  par.vec, 
                                  re.cross=NULL, 
                                  mat.line=NULL, 
-                                 qtl.num=1){
+                                 qtl.num=1,
+                                 strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
   if (cross.type == "f2") {
-    effects <- calc.f2.effects(line.m=line.m, line.p=line.p, par.vec=par.vec, qtl.num=qtl.num)
+    effects <- calc.f2.effects(line.m=line.m, 
+                               line.p=line.p, 
+                               par.vec=par.vec, 
+                               qtl.num=qtl.num, 
+                               strain.order=rev(strains))
     qtl.var <- (1/2)*effects[1]^2 + (1/4)*effects[2]^2
     
-    phenotypes <- calc.phenotypes.f2(line.m=line.m, line.p=line.p, par.vec=par.vec, qtl.num=qtl.num)
+    phenotypes <- calc.phenotypes.f2(line.m=line.m, 
+                                     line.p=line.p, 
+                                     par.vec=par.vec, 
+                                     qtl.num=qtl.num, 
+                                     strain.order=rev(strains))
   }
   else if (cross.type == "bc") {
     if (re.cross == line.m) {
@@ -284,10 +346,19 @@ calc.var.exp.general <- function(line.m,
       other.line <- line.m
       type <- "bc2"
     }
-    effects <- calc.bc.effects(re.cross.line=re.cross, other.line=other.line, par.vec=par.vec, qtl.num=qtl.num)
+    effects <- calc.bc.effects(re.cross.line=re.cross, 
+                               other.line=other.line, 
+                               par.vec=par.vec, 
+                               qtl.num=qtl.num, 
+                               strain.order=rev(strains))
     qtl.var <- (1/4)*(effects)^2
     
-    phenotypes <- calc.phenotypes.bc(re.cross.line=re.cross, other.line=other.line, par.vec=par.vec, qtl.num=qtl.num, cross.type=type)
+    phenotypes <- calc.phenotypes.bc(re.cross.line=re.cross, 
+                                     other.line=other.line, 
+                                     par.vec=par.vec, 
+                                     qtl.num=qtl.num, 
+                                     cross.type=type, 
+                                     strain.order=rev(strains))
   }
   else if (cross.type == "rbc") {
     if (re.cross == line.m) {
@@ -312,7 +383,8 @@ calc.var.exp.general <- function(line.m,
                                 other.line=other.line, 
                                 mat.line=mat.line, 
                                 par.vec=par.vec, 
-                                qtl.num=qtl.num)
+                                qtl.num=qtl.num,
+                                strain.order=rev(strains))
     qtl.var <- (1/4)*(effects)^2
     
     phenotypes <- calc.phenotypes.rbc(re.cross.line=re.cross, 
@@ -320,7 +392,8 @@ calc.var.exp.general <- function(line.m,
                                       mat.line=mat.line, 
                                       par.vec=par.vec, 
                                       qtl.num=qtl.num, 
-                                      cross.type=type)
+                                      cross.type=type,
+                                      strain.order=rev(strains))
   }
   perc.var <- 100*qtl.var*qtl.num/(qtl.var*qtl.num + par.vec["sigma2"])
   return(list(phenotypes, as.numeric(perc.var)))
@@ -340,15 +413,60 @@ var.matcher.general <- function(par.vec,
   for (i in 1:(length(strains)-1)) {
     for (j in mover:length(strains)) {
       # Cross types
-      bc.cross1 <- calc.var.exp.general(line.m=strains[i], line.p=strains[j], cross.type="bc", par.vec=par.vec, re.cross=strains[i], qtl.num=qtl.num)
-      rbc.cross1_1 <- calc.var.exp.general(line.m=strains[i], line.p=strains[j], cross.type="rbc", par.vec=par.vec, re.cross=strains[i], mat.line=strains[i], qtl.num=qtl.num)
-      rbc.cross1_2 <- calc.var.exp.general(line.m=strains[i], line.p=strains[j], cross.type="rbc", par.vec=par.vec, re.cross=strains[i], mat.line=strains[j], qtl.num=qtl.num)
+      bc.cross1 <- calc.var.exp.general(line.m=strains[i], 
+                                        line.p=strains[j], 
+                                        cross.type="bc", 
+                                        par.vec=par.vec, 
+                                        re.cross=strains[i], 
+                                        qtl.num=qtl.num, 
+                                        strains=strains)
+      rbc.cross1_1 <- calc.var.exp.general(line.m=strains[i], 
+                                           line.p=strains[j], 
+                                           cross.type="rbc", 
+                                           par.vec=par.vec, 
+                                           re.cross=strains[i], 
+                                           mat.line=strains[i], 
+                                           qtl.num=qtl.num, 
+                                           strains=strains)
+      rbc.cross1_2 <- calc.var.exp.general(line.m=strains[i], 
+                                           line.p=strains[j], 
+                                           cross.type="rbc", 
+                                           par.vec=par.vec, 
+                                           re.cross=strains[i], 
+                                           mat.line=strains[j], 
+                                           qtl.num=qtl.num, 
+                                           strains=strains)
 
-      bc.cross2 <- calc.var.exp.general(line.m=strains[i], line.p=strains[j], cross.type="bc", par.vec=par.vec, re.cross=strains[j], qtl.num=qtl.num)
-      rbc.cross2_1 <- calc.var.exp.general(line.m=strains[i], line.p=strains[j], cross.type="rbc", par.vec=par.vec, re.cross=strains[j], mat.line=strains[i], qtl.num=qtl.num)
-      rbc.cross2_2 <- calc.var.exp.general(line.m=strains[i], line.p=strains[j], cross.type="rbc", par.vec=par.vec, re.cross=strains[j], mat.line=strains[j], qtl.num=qtl.num)
+      bc.cross2 <- calc.var.exp.general(line.m=strains[i], 
+                                        line.p=strains[j], 
+                                        cross.type="bc", 
+                                        par.vec=par.vec, 
+                                        re.cross=strains[j], 
+                                        qtl.num=qtl.num, 
+                                        strains=strains)
+      rbc.cross2_1 <- calc.var.exp.general(line.m=strains[i], 
+                                           line.p=strains[j], 
+                                           cross.type="rbc", 
+                                           par.vec=par.vec, 
+                                           re.cross=strains[j], 
+                                           mat.line=strains[i], 
+                                           qtl.num=qtl.num, 
+                                           strains=strains)
+      rbc.cross2_2 <- calc.var.exp.general(line.m=strains[i], 
+                                           line.p=strains[j], 
+                                           cross.type="rbc", 
+                                           par.vec=par.vec, 
+                                           re.cross=strains[j], 
+                                           mat.line=strains[j], 
+                                           qtl.num=qtl.num, 
+                                           strains=strains)
       
-      f2.cross <- calc.var.exp.general(line.m=strains[i], line.p=strains[j], cross.type="f2", par.vec=par.vec, qtl.num=qtl.num)
+      f2.cross <- calc.var.exp.general(line.m=strains[i], 
+                                       line.p=strains[j], 
+                                       cross.type="f2", 
+                                       par.vec=par.vec, 
+                                       qtl.num=qtl.num, 
+                                       strains=strains)
       
       # Processing output
       cross.names <- paste(strains[i], "x", strains[j], sep="")
