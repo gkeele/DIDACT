@@ -117,8 +117,8 @@ diallel.phenotype.map <- function(mother.str.var, father.str.var, phenotype, dat
   if (is.null(phenotype.title)) { phenotype.title <- phenotype }
   heatmap(t(data.mat), scale="none", Colv=NA, Rowv=NA,
           revC=TRUE, symm=TRUE, ColSideColors = strain.colors, margins=c(6, 6),
-          RowSideColors = strain.colors, xlab=expression(bold("sire")), 
-          ylab=expression(bold("dam")), col=my_palette, main=paste("Observed mean", phenotype.title))
+          RowSideColors = strain.colors, xlab=expression(bold("Paternal")), 
+          ylab=expression(bold("Maternal")), col=my_palette, main=paste("Observed mean", phenotype.title))
 }
 
 #' @export
