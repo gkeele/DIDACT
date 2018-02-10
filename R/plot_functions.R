@@ -1,17 +1,22 @@
 # Plots out effect intervals for diallel data
 #' @export
-caterpillar.plot <- function(mcmc.object, 
+caterpillar.plot <- function(gibbs.object, 
                              name=NULL, 
                              include.effect.types=c("mu", "female", "add", "mat", "inbred", "epi", "var"),
                              col=c("black", "black", "dodgerblue2", "forestgreen", "darkorange2", "darkorchid1", "black"),
                              inbred.penalty.col="firebrick2",
                              manual.limits=NULL){
-  # Processing the plotted variables
+  mcmc.object <- gibbs.object$mcmc
+  
+   # Processing the plotted variables
   reorder.names <- NULL
   include.col <- rep(FALSE, ncol(mcmc.object))
   use.color <- NULL
   for (i in 1:length(include.effect.types)){
-    if (include.effect.types[i] == "var") {
+    if (include.effect.types[i] == "mu") {
+      temp.include.col <- grepl(x=colnames(mcmc.object), pattern="^mu$", perl=TRUE)
+    }
+    else if (include.effect.types[i] == "var") {
       temp.include.col <- grepl(x=colnames(mcmc.object), pattern="tau|sigma")
     }
     else {
@@ -34,7 +39,7 @@ caterpillar.plot <- function(mcmc.object,
   means.data <- as.vector(apply(mcmc.object, 2, function(x) mean(x)))
   median.data <- as.vector(apply(mcmc.object, 2, function(x) median(x)))
   
-  titlename = strsplit(deparse(substitute(mcmc.object)), ".", fixed=T)[1]
+  titlename = strsplit(deparse(substitute(mcmc.object)), ".", fixed=TRUE)[1]
   if (!is.null(name)) {
     titlename=name
   }
@@ -50,7 +55,7 @@ caterpillar.plot <- function(mcmc.object,
   plot(ci95.data[1, 1:2], c(1,1), panel.first = abline(h = 1, lty = 3, col = "gray88"), 
        type = "l", ylim = c(0, num.var+1), main = paste(titlename, "parameters"), 
        xlim = this.x.lim, xlab = "HPD intervals of strain effects and model parameters", 
-       ylab = "", yaxt = "n", lty=1, lwd=1, col = use.color[1], frame.plot=F)
+       ylab = "", yaxt = "n", lty=1, lwd=1, col = use.color[1], frame.plot=FALSE)
   if (length(ci95.data[1,]) > 2){
     for (i in seq(3, length(ci95.data[1,])-1, by=2)) {
       lines(ci95.data[1, c(i,i+1)], c(1,1), lty=1, lwd=1, col=use.color[1], lend=2)
@@ -77,6 +82,47 @@ caterpillar.plot <- function(mcmc.object,
   axis(2, c(1:num.var), par.names, c(1:num.var), las = 2, tck = -0.005, cex.axis = 0.5)
 }
 
+########## Diallel plots
+#' @export
+diallel.phenotype.map <- function(mother.str.var, father.str.var, phenotype, data,
+                                  phenotype.title=NULL,
+                                  strains.reorder=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
+                                  strain.names=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
+                                  strain.colors=c("#F0F000", "#808080", "#F08080", "#1010F0", 
+                                                  "#00A0F0", "#00A000", "#F00000", "#9000E0")){
+  if (!is.null(strains.reorder)) {
+    data[,mother.str.var] <- factor(data[,mother.str.var], levels=strains.reorder)
+    data[,father.str.var] <- factor(data[,father.str.var], levels=strains.reorder)
+  }
+  
+  num.strains <- length(unique(c(data[, mother.str.var], data[, father.str.var])))
+  data.mat <- matrix(NA, nrow=num.strains, ncol=num.strains)
+  match.vec <- expand.grid(levels(data[, mother.str.var]), levels(data[, mother.str.var]))
+  match.vec$paste <- paste(match.vec$Var1, match.vec$Var2, sep="x")
+  match.mat <- matrix(as.character(match.vec$paste), nrow=num.strains, ncol=num.strains)
+  colnames(match.mat) <- rownames(match.mat) <- strain.names
+  colnames(data.mat) <- rownames(data.mat) <- strain.names
+  my_palette <- colorRampPalette(c("white", "black"))(n = 299)
+  
+  data$cross <- paste(data[,mother.str.var], data[,father.str.var], sep="x")
+  
+  phenotype.summary <- aggregate(formula(paste(phenotype, "cross", sep="~")), data=data, FUN=mean, na.rm=TRUE)
+  for(j in 1:num.strains){
+    for(k in 1:num.strains){
+      this.cross <- as.character(match.mat[j, k])
+      try(data.mat[j, k] <- as.numeric(phenotype.summary[phenotype.summary$cross==this.cross, phenotype]),
+          silent=TRUE)
+    }
+  }
+  if (is.null(phenotype.title)) { phenotype.title <- phenotype }
+  heatmap(t(data.mat), scale="none", Colv=NA, Rowv=NA,
+          revC=TRUE, symm=TRUE, ColSideColors = strain.colors, margins=c(6, 6),
+          RowSideColors = strain.colors, xlab=expression(bold("sire")), 
+          ylab=expression(bold("dam")), col=my_palette, main=paste("Observed mean", phenotype.title))
+}
+
+
+
 ######################## Plot for all crosses
 #' @export
 diallelPlotter <- function(results, 
@@ -86,8 +132,8 @@ diallelPlotter <- function(results,
                            path=NULL,
                            height=12,
                            width=12,
-                           strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
-                           off.x=TRUE,
+                           strains.relabel=NULL,
+                           include.off.x=TRUE,
                            include.biparent.labels=TRUE,
                            include.density=TRUE,
                            include.widgets=TRUE,
@@ -103,12 +149,16 @@ diallelPlotter <- function(results,
   qtl.num <- results$qtl.num
   n <- results$n
   col.spectrum <- col.spectrum[1]
+  strains <- results$strains
+  num.strains <- length(strains)
   
   absolute.max <- NULL
   if (absolute.density.scale) {
     for (i in which(grepl(x=names(eu.list), pattern=cross.type))) {
       absolute.max <- max(absolute.max,
-                          max(hist(eu.list[[i]], plot=FALSE, breaks=seq(0, qtl.num, length.out=20))$density))
+                          max(hist(eu.list[[i]], 
+                                   plot=FALSE, 
+                                   breaks=seq(0, qtl.num, length.out=20))$density))
     }
   }
   
@@ -116,24 +166,24 @@ diallelPlotter <- function(results,
   spectrum <- make.spectrum(col.spectrum=col.spectrum, n=1000)
   
   # Placing labels
-  label.indices <- 1:8
-  if(pheno.name==""){
+  label.indices <- 1:num.strains
+  if (pheno.name=="") {
     pheno.name <- strsplit(deparse(substitute(eu.list)), split=".", fixed=T)[[1]][1]
   }
   if (!is.null(path)) {
-    pdf(paste(path,"/Diallel_", pheno.name, "_", cross.type, "_", qtl.num, "qtl", sep = ""),
-        width=12, height = 12)    
+    pdf(paste0(path,"/Diallel_", pheno.name, "_", cross.type, "_", qtl.num, "qtl.pdf"),
+        width=12, height=12)    
   }
-  par(mfrow=c(8,8), 
+  par(mfrow=c(num.strains, num.strains), 
       cex = 0.5, 
-      oma=c(1,1,1,0), 
-      mar=c(1,1,1,1))
+      oma=c(1, 1, 1, 0), 
+      mar=c(1, 1, 1, 1))
   ## CHOOSE SUBSET OF DATA
-  for (i in 1:length(strains)) {
-    for (j in 1:length(strains)) {
+  for (i in 1:num.strains) {
+    for (j in 1:num.strains) {
       if (cross.type == "f2"){
-        if(i == j){
-          if(i == 1){
+        if (i == j) {
+          if (i == 1) {
             infoPlotter(trait=pheno.name, 
                           experiment=cross.type,
                           n=n,
@@ -141,22 +191,22 @@ diallelPlotter <- function(results,
                           qtl.num=qtl.num,
                           include.widgets=include.widgets)
           }
-          else if(i == 2){
+          else if (i == 2) {
             if (include.widgets) {
               legendPlotter()
             }
             else {
-              emptyPlotter(off.x=off.x)
+              emptyPlotter(include.off.x=include.off.x)
             }
           }
-          else{
-            emptyPlotter(off.x=off.x)
+          else {
+            emptyPlotter(include.off.x=include.off.x)
           }
         }
-        else if(i > j){
-          emptyPlotter(off.x=off.x)
+        else if (i > j) {
+          emptyPlotter(include.off.x=include.off.x)
         }      	
-        else{
+        else {
           oneParamPlotter(cross.u=eu.list[[paste(strains[i], "x", strains[j], "-f2_eu", sep="")]],
                           cross.type="f2", qtl.perc=median(var.list[[paste(strains[i], "x", strains[j], "-f2_perc", sep="")]]),
                           qtl.num=qtl.num, 
@@ -188,15 +238,15 @@ diallelPlotter <- function(results,
               legendPlotter()
             }
             else {
-              emptyPlotter(off.x=off.x)
+              emptyPlotter(include.off.x=include.off.x)
             }
           }
-          else{
-            emptyPlotter(off.x=off.x)
+          else {
+            emptyPlotter(include.off.x=include.off.x)
           }
         }
-        else{
-          if(i < j){
+        else {
+          if (i < j) {
             oneParamPlotter(eu.list[[paste(strains[i], "x", strains[j], "-bc1_eu", sep="")]],
                             cross.type="bc", qtl.perc=median(var.list[[paste(strains[i], "x", strains[j], "-bc1_perc", sep="")]]),
                             homo1.vec=pheno.list[[paste(strains[i], "x", strains[j], "-bc1-hom", sep="")]],
@@ -211,7 +261,7 @@ diallelPlotter <- function(results,
                             median.line.col=median.line.col,
                             ...)          				
           }
-          else{
+          else {
             oneParamPlotter(eu.list[[paste(strains[j], "x", strains[i], "-bc2_eu", sep="")]],
                             cross.type="bc", qtl.perc=median(var.list[[paste(strains[j], "x", strains[i], "-bc2_perc", sep="")]]),
                             homo1.vec=pheno.list[[paste(strains[j], "x", strains[i], "-bc2-hom", sep="")]],
@@ -238,7 +288,7 @@ diallelPlotter <- function(results,
                         qtl.num=qtl.num,
                         include.widgets=include.widgets)
           }
-          else if(i == 2) {
+          else if (i == 2) {
             if (include.widgets) {
               legendPlotter()
             }
@@ -247,7 +297,7 @@ diallelPlotter <- function(results,
             }
           }
           
-          else{
+          else {
             emptyRBCPlotter()
           }  
         }
@@ -341,18 +391,18 @@ diallelPlotter <- function(results,
       }
       if (j %in% label.indices & i == 1) {
         if (include.biparent.labels) {
-          mtext(paste(strains[j], "(B)"), side=3, cex=1.1)
+          mtext(paste(ifelse(is.null(strains.relabel), strains[j], strains.relabel[j]), "(A)"), side=3, cex=1.1)
         }
         else {
-          mtext(strains[j], side=3, cex=1.1)
+          mtext(ifelse(is.null(strains.relabel), strains[j], strains.relabel[j]), side=3, cex=1.1)
         }
       }
-      if(i %in% label.indices & j == 1){
+      if (i %in% label.indices & j == 1) {
         if (include.biparent.labels) {
-          mtext(paste(strains[i], "(A)"), side=2, cex=1.1)
+          mtext(paste(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), "(B)"), side=2, cex=1.1)
         }
         else {
-          mtext(strains[j], side=3, cex=1.1)
+          mtext(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), side=3, cex=1.1)
         }
       }
     }
@@ -374,15 +424,17 @@ make.spectrum <- function(col.spectrum, n=1000) {
   return(spectrum)
 }
 
-emptyPlotter <- function(off.x=FALSE, ...){
-  if (off.x) {
+emptyPlotter <- function(include.off.x=FALSE, ...){
+  if (!include.off.x) {
     this.col <- "white"
   }
   else {
     this.col <- "black"
   }
-  plot(x=1, y=1, cex=50, pch=4, xlab="", ylab="",
-       frame.plot=FALSE, xaxt="n", yaxt="n", col=this.col)
+  plot(x=1, y=1, cex=50, pch=4, xlab="", ylab="", xlim=c(0,1), ylim=c(0,1),
+       frame.plot=FALSE, xaxt="n", yaxt="n", col="white")
+  lines(x=c(0, 1), y=c(0, 1), col=this.col)
+  lines(x=c(0, 1), y=c(1, 0), col=this.col)
 }
 
 emptyF2Plotter <- function(background){
@@ -412,7 +464,7 @@ legendPlotter <- function(){
   plot(NA, xlim=c(0,1), ylim=c(0,1), xlab="", ylab="", frame=FALSE, xaxt="n", yaxt="n")
   
   legend("center", legend=c("QTL", "Noise"), 
-         fill=c("gray50", "white"), border="black", bty="n", 
+         fill=c("white", "gray50"), border="black", bty="n", 
          title="Variation type", cex=1.3, pt.cex=1.3) 
 }
 
@@ -561,21 +613,22 @@ oneParamPlotter <- function(cross.u,
   if (include.widgets) {
     if (qtl.num == 1) {
       mapplots::add.pie(z=c(qtl/100, total/100), labels=NA, x=0.5*x.high, y=0.75*y.max, radius=(3/10)*(9/10)*y.range, 
-                        col=(c("gray50", "white")), cex=1.3, label.dist=1.2, border=border.col)
+                        col=(c("white", "gray50")), cex=1.3, label.dist=1.2, border=border.col)
     }
     else {
       excess.qtl <- round(qtl*(qtl.num-1), 1)
       mapplots::add.pie(z=c(qtl/100, excess.qtl/100, total/100), labels=NA, x=0.5*x.high, y=0.75*y.max, radius=(3/10)*(9/10)*y.range, 
-                        col=(c("gray50", "gray50", "white")), cex=1.3, label.dist=1.2, border=border.col)  
+                        col=(c("white", "white", "gray50")), cex=1.3, label.dist=1.2, border=border.col)  
     }
-    legend("topright", 
+    legend(x=0.6*x.high,
+           y=y.max+0.04*y.max,
            legend=c(qtl, total), 
-           fill=c("gray50", "white"), 
+           fill=c("white", "gray50"), 
            title="% Variance", 
            border=border.col, 
            bty="n", 
            text.col=border.col, 
-           cex=1.2)
+           cex=1.1)
     
     if (cross.type == "f2") {
       f2boxPlotter(homo1.vec=homo1.vec, 

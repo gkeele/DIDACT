@@ -1,15 +1,15 @@
 # Creates a group-identity matrix given a vector of factors
 incidence.matrix <- function(fact){
-  m=diag(nlevels(fact))[fact,]
+  m <- diag(nlevels(fact))[fact,]
   colnames(m) <- levels(fact)
   return(m)
 }
 # Creates constraint matrix
-make.M <- function(X, n){
+make.M <- function(X){
   j <- ncol(X)
   k <- (-1 + sqrt(j))*(j - 1)^(-3/2)
   m <- 1/sqrt(j - 1)
-  c <- (n - 2)*k + m
+  c <- (nrow(X) - 2)*k + m
   M <- diag(j - 1)
   M[M == 0] <- -k
   M <- rbind(M, rep(-m, j - 1))
@@ -43,11 +43,20 @@ update.tau <- function(K, prior.alpha, prior.beta, par.vec)
 #' @export
 diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str, n.iter, burn.in, multi.chain=1, thin=1,
                           sigma.2.starter=5, taua.starter=2, taud.starter=2, tauo.starter=2, taue.starter=2,
-                          strain.reorder=c(8, 7, 4, 6, 5, 1, 3, 2), use.constraint=T)
+                          strains.reorder=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"), 
+                          use.constraint=TRUE)
 {
+  strains <- unique(c(as.character(mother.str), as.character(father.str)))
+  num.strains <- length(strains)
   # Defining strain columns and incidence matrices
-  mother.str <- factor(mother.str, levels(mother.str)[strain.reorder])
-  father.str <- factor(father.str, levels(father.str)[strain.reorder])
+  if (!is.null(strains.reorder)){
+    mother.str <- factor(mother.str, levels=strains)
+    father.str <- factor(father.str, levels=strains)
+  }
+  else {
+    mother.str <- factor(mother.str)
+    father.str <- factor(father.str)
+  }
   mom.mat <- incidence.matrix(mother.str)
   pop.mat <- incidence.matrix(father.str)
   
@@ -97,10 +106,10 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
   
   # Making constraint matrix
   if(use.constraint){
-    M.add <- make.M(X=add.part, n=n)
-    M.inbred <- make.M(X=inbred.part, n=n)
-    M.mat <- make.M(X=mat.part, n=n)
-    M.epi <- make.M(X=epi.part, n=n)
+    M.add <- make.M(X=add.part)
+    M.inbred <- make.M(X=inbred.part)
+    M.mat <- make.M(X=mat.part)
+    M.epi <- make.M(X=epi.part)
     
     # Transforming design matrices
     add.part <- add.part %*% M.add
@@ -122,7 +131,8 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
   } 
   for (j in 1:multi.chain) {
     # Allocate memory
-    p.mat <- matrix(0, n.iter, 60) # 3 fixed effects, 8 additive, 8 inbred, 8 maternal, 28 epistatic
+    n.col <- 3 + 3*num.strains + choose(num.strains, 2) + 5
+    p.mat <- matrix(0, n.iter, n.col) # 3 fixed effects, 8 additive, 8 inbred, 8 maternal, 28 epistatic
     
     # Set hyperparameters
     ga.alpha <- 0.002
@@ -215,9 +225,11 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
   
   # Return matrix or list of matrix
   if (multi.chain > 1) {
-    return(coda::as.mcmc.list(chain.list))
+    return(list(mcmc=coda::as.mcmc.list(chain.list),
+                strains=strains))
   }
   else {
-    return(coda::as.mcmc(p.mat))
+    return(list(mcmc=coda::as.mcmc(p.mat),
+                strains=strains))
   }
 }

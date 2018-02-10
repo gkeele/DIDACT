@@ -224,8 +224,16 @@ power.cruncher.general <- function(line.m,
     else{
       other.line <- line.m
     }
-    rbc.effects <- calc.rbc.effects(re.cross.line=re.cross, other.line=other.line, mat.line=mat.line, par.vec=par.vec, qtl.num=qtl.num, strain.order=rev(strains))
-    power.val <- qtlDesign::powercalc(cross="bc", n=n, effect=rbc.effects, sigma2=par.vec["sigma2"])[1]
+    rbc.effects <- calc.rbc.effects(re.cross.line=re.cross, 
+                                    other.line=other.line, 
+                                    mat.line=mat.line, 
+                                    par.vec=par.vec, 
+                                    qtl.num=qtl.num, 
+                                    strain.order=rev(strains))
+    power.val <- qtlDesign::powercalc(cross="bc", 
+                                      n=n, 
+                                      effect=rbc.effects, 
+                                      sigma2=par.vec["sigma2"])[1]
   }
   return(power.val)
 }
@@ -572,12 +580,23 @@ picker <- function(mat, row, col){
 
 ##################### Collapse parameter set list to experiment list
 #' @export
-evaluate.experiments <- function(par.mat, 
+evaluate.experiments <- function(gibbs.object, 
                                  n, 
                                  qtl.num=1, 
-                                 strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
+                                 strains.relabel=NULL){
   # Using previous functions
-  par.bundle <- par.cruncher.general(par.mat=par.mat, n=n, qtl.num=qtl.num, strains=strains)
+  par.mat <- gibbs.object$mcmc
+  strains <- gibbs.object$strains
+  num.strains <- length(strains)
+  
+  if (!is.null(strains.relabel)) {
+    strains <- strains.relabel
+  }
+  
+  par.bundle <- par.cruncher.general(par.mat=par.mat, 
+                                     n=n, 
+                                     qtl.num=qtl.num, 
+                                     strains=strains)
   var.list <- par.bundle[[3]]
   pheno.list <- par.bundle[[2]]
   power.list <- par.bundle[[1]]
@@ -594,7 +613,7 @@ evaluate.experiments <- function(par.mat,
   pheno.counter <- 0
   
   for (i in 1:15) {
-    for (j in 1:28) {
+    for (j in 1:choose(num.strains, 2)) {
       if (i < 8) {
         # utility
         eu.experiment <- as.numeric(do.call(c, lapply(eu.list, function(x) picker(x, j, i))))  
@@ -614,6 +633,12 @@ evaluate.experiments <- function(par.mat,
       names(pheno.exp.list)[pheno.counter] <- paste(rownames(pheno.list[[1]])[j], "-", colnames(pheno.list[[1]])[i], sep="")
     }
   }
-  results <- list(eu=eu.exp.list, pheno=pheno.exp.list, var=var.exp.list, qtl.num=qtl.num, n=n)
+  results <- list(eu=eu.exp.list, 
+                  pheno=pheno.exp.list, 
+                  var=var.exp.list, 
+                  qtl.num=qtl.num, 
+                  n=n,
+                  strains=strains)
   return(results)
 }
+
