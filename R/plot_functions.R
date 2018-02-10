@@ -121,6 +121,22 @@ diallel.phenotype.map <- function(mother.str.var, father.str.var, phenotype, dat
           ylab=expression(bold("dam")), col=my_palette, main=paste("Observed mean", phenotype.title))
 }
 
+#' @export
+diallel.phenotype.scale <- function(mother.str.var, father.str.var, phenotype, data){
+  my_palette <- colorRampPalette(c("white", "black"))(n = 299)
+  
+  data$cross <- paste(data[,mother.str.var], data[,father.str.var], sep="x")
+  phenotype.summary <- aggregate(formula(paste(phenotype, "cross", sep="~")), data=data, FUN=mean, na.rm=TRUE)
+  
+  plot(c(1:length(my_palette)), rep(1,length(my_palette)), 
+       pch="|", col=my_palette, cex=3, ylab="", xlab="",
+       yaxt="n", frame.plot=FALSE, ylim=c(0.75, 1.25), xaxt="n",
+       xlim=c(0, 350))
+  labs <- signif(as.numeric(pretty(range(phenotype.summary[,phenotype], na.rm=TRUE))), digits=2)
+  axis(side=1, at=seq(from=1, to=length(my_palette), length.out=length(labs)),
+       labels=labs)
+}
+
 
 
 ######################## Plot for all crosses

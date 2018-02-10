@@ -3,5 +3,6 @@
 export(caterpillar.plot)
 export(diallel.gibbs)
 export(diallel.phenotype.map)
+export(diallel.phenotype.scale)
 export(diallelPlotter)
 export(evaluate.experiments)
