@@ -262,12 +262,12 @@ diallelPlotter <- function(results,
           }
         }
         else {
-          if (i < j) {
+          if (i < j) { ## Upper diag plots
             oneParamPlotter(eu.list[[paste(strains[i], "x", strains[j], "-bc1_eu", sep="")]],
                             cross.type="bc", qtl.perc=median(var.list[[paste(strains[i], "x", strains[j], "-bc1_perc", sep="")]]),
                             homo1.vec=pheno.list[[paste(strains[i], "x", strains[j], "-bc1-hom", sep="")]],
                             hetero.vec=pheno.list[[paste(strains[i], "x", strains[j], "-bc1-het", sep="")]],
-                            qtl.num=qtl.num, back.allele="B",
+                            qtl.num=qtl.num, back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
@@ -277,7 +277,7 @@ diallelPlotter <- function(results,
                             median.line.col=median.line.col,
                             ...)          				
           }
-          else {
+          else { ## Lower diag plots
             oneParamPlotter(eu.list[[paste(strains[j], "x", strains[i], "-bc2_eu", sep="")]],
                             cross.type="bc", qtl.perc=median(var.list[[paste(strains[j], "x", strains[i], "-bc2_perc", sep="")]]),
                             homo1.vec=pheno.list[[paste(strains[j], "x", strains[i], "-bc2-hom", sep="")]],
@@ -309,21 +309,22 @@ diallelPlotter <- function(results,
               legendPlotter()
             }
             else {
-              emptyRBCPlotter()
+              emptyRBC1Plotter()
             }
           }
           
           else {
-            emptyRBCPlotter()
+            emptyRBC1Plotter()
           }  
         }
         else {
-          if (i < j) {
+          if (i < j) { ## Upper diagonal
             oneParamPlotter(eu.list[[paste(strains[i], "x", strains[j], "-rbc1_1_eu", sep="")]],
                             cross.type="bc", qtl.perc=median(var.list[[paste(strains[i], "x", strains[j], "-rbc1_1_perc", sep="")]]),
                             homo1.vec=pheno.list[[paste(strains[i], "x", strains[j], "-rbc1_1-hom", sep="")]],
                             hetero.vec=pheno.list[[paste(strains[i], "x", strains[j], "-rbc1_1-het", sep="")]],
-                            qtl.num=qtl.num, back.allele="A",
+                            qtl.num=qtl.num, 
+                            back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
@@ -333,12 +334,13 @@ diallelPlotter <- function(results,
                             median.line.col=median.line.col,
                             ...)            			
           }
-          else {
-            oneParamPlotter(eu.list[[paste(strains[j], "x", strains[i], "-rbc1_2_eu", sep="")]],
-                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[j], "x", strains[i], "-rbc1_2_perc", sep="")]]),
-                            homo1.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc1_2-hom", sep="")]],
-                            hetero.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc1_2-het", sep="")]],
-                            qtl.num=qtl.num, back.allele="A",
+          else { ## Lower diagonal
+            oneParamPlotter(eu.list[[paste(strains[j], "x", strains[i], "-rbc2_2_eu", sep="")]],
+                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[j], "x", strains[i], "-rbc2_2_perc", sep="")]]),
+                            homo1.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc2_2-hom", sep="")]],
+                            hetero.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc2_2-het", sep="")]],
+                            qtl.num=qtl.num, 
+                            back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
@@ -365,11 +367,11 @@ diallelPlotter <- function(results,
               legendPlotter()
             }
             else{
-              emptyRBCPlotter()
+              emptyRBC2Plotter()
             }  
           }
           else {
-            emptyRBCPlotter()
+            emptyRBC2Plotter()
           }
         }
         else {
@@ -389,10 +391,10 @@ diallelPlotter <- function(results,
                             ...)              		
           }
           else {
-            oneParamPlotter(eu.list[[paste(strains[j], "x", strains[i], "-rbc2_2_eu", sep="")]],
-                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[j], "x", strains[i], "-rbc2_2_perc", sep="")]]),
-                            homo1.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc2_2-hom", sep="")]],
-                            hetero.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc2_2-het", sep="")]],
+            oneParamPlotter(eu.list[[paste(strains[j], "x", strains[i], "-rbc1_2_eu", sep="")]],
+                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[j], "x", strains[i], "-rbc1_2_perc", sep="")]]),
+                            homo1.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc1_2-hom", sep="")]],
+                            hetero.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc1_2-het", sep="")]],
                             qtl.num=qtl.num, back.allele="B",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
@@ -407,7 +409,7 @@ diallelPlotter <- function(results,
       }
       if (j %in% label.indices & i == 1) {
         if (include.biparent.labels) {
-          mtext(paste(ifelse(is.null(strains.relabel), strains[j], strains.relabel[j]), "(A)"), side=3, cex=1.1)
+          mtext(paste(ifelse(is.null(strains.relabel), strains[j], strains.relabel[j]), "(B)"), side=3, cex=1.1)
         }
         else {
           mtext(ifelse(is.null(strains.relabel), strains[j], strains.relabel[j]), side=3, cex=1.1)
@@ -415,7 +417,7 @@ diallelPlotter <- function(results,
       }
       if (i %in% label.indices & j == 1) {
         if (include.biparent.labels) {
-          mtext(paste(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), "(B)"), side=2, cex=1.1)
+          mtext(paste(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), "(A)"), side=2, cex=1.1)
         }
         else {
           mtext(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), side=3, cex=1.1)
@@ -468,7 +470,7 @@ emptyBCPlotter <- function(background){
   text(0, -3, labels=paste("Background: ", background, " (A)", sep=""), cex=1.5)
 }
 
-emptyRBCPlotter <- function(){
+emptyRBC1Plotter <- function(){
   plot(x=1,y=1, cex = 1, pch ="", xlab = "", ylab = "", xlim=c(-10, 10), ylim=c(-10,10),
        frame.plot = FALSE, xaxt = "n", yaxt = "n", col="white")
 
@@ -476,12 +478,20 @@ emptyRBCPlotter <- function(){
   text(0, -1, "Maternal Strain", cex=1.5)
 }
 
+emptyRBC2Plotter <- function(){
+  plot(x=1,y=1, cex = 1, pch ="", xlab = "", ylab = "", xlim=c(-10, 10), ylim=c(-10,10),
+       frame.plot = FALSE, xaxt = "n", yaxt = "n", col="white")
+  
+  arrows(3, 3, -3 , 3, length=0.1)
+  text(0, -1, "Paternal Strain", cex=1.5)
+}
+
 legendPlotter <- function(){
   plot(NA, xlim=c(0,1), ylim=c(0,1), xlab="", ylab="", frame=FALSE, xaxt="n", yaxt="n")
   
   legend("center", legend=c("QTL", "Noise"), 
          fill=c("white", "gray50"), border="black", bty="n", 
-         title="Variation type", cex=1.3, pt.cex=1.3) 
+         title="Variance attributable to", cex=1.3, pt.cex=1.3) 
 }
 
 infoPlotter <- function(trait,
@@ -494,8 +504,8 @@ infoPlotter <- function(trait,
   
   if (experiment == "f2") { this.experiment <- "F2" }
   if (experiment == "bc") { this.experiment <- "BC" }
-  if (experiment == "rbc1") { this.experiment <- "RBC (A)" }
-  if (experiment == "rbc2") { this.experiment <- "RBC (B)" }
+  if (experiment == "rbc1") { this.experiment <- "RBC (A maternal)" }
+  if (experiment == "rbc2") { this.experiment <- "RBC (A paternal)" }
   
   text(x=0.1, y=0.9, labels=paste("Cross type:", this.experiment), adj=0, cex=1.2)
   text(x=0.1, y=0.8, labels=paste("Trait:", trait), adj=0, cex=1.2)
@@ -507,9 +517,9 @@ infoPlotter <- function(trait,
           border=FALSE, space=FALSE, axes=FALSE, add=TRUE)
   axis(1, at=0:qtl.num, labels=0:qtl.num, tick=TRUE, cex.axis=1.2)
   text(x=0.5, 0.2, labels="Posterior mean utility", cex=1.3)
-  if (include.widgets) {
-       
-  }
+  # if (include.widgets) {
+  #      
+  # }
 }
 
 f2boxPlotter <- function(homo1.vec, 
@@ -553,26 +563,32 @@ bcboxPlotter <- function(homo.vec,
   min.box.y <- min(homo.vec, hetero.vec, na.rm=TRUE)
   box.y.range <- max.box.y - min.box.y
   # Scaling and rescaling
-  homo.vec.sc <- (homo.vec - min.box.y)*(y.max*(4/7)/(max.box.y-min.box.y)) + y.max*(4/3)
-  hetero.vec.sc <- (hetero.vec - min.box.y)*(y.max*(4/7)/(max.box.y-min.box.y)) + y.max*(4/3)
+  if (back.allele == "A") {
+    homo1.vec.sc <- (homo.vec - min.box.y)*(y.max*(4/7)/(max.box.y-min.box.y)) + y.max*(4/3)
+    hetero.vec.sc <- (hetero.vec - min.box.y)*(y.max*(4/7)/(max.box.y-min.box.y)) + y.max*(4/3)
+    homo2.vec.sc <- rep(NA, length(homo.vec))
+  }
+  else {
+    homo1.vec.sc <- rep(NA, length(homo.vec))
+    hetero.vec.sc <- (hetero.vec - min.box.y)*(y.max*(4/7)/(max.box.y-min.box.y)) + y.max*(4/3)
+    homo2.vec.sc <- (homo.vec - min.box.y)*(y.max*(4/7)/(max.box.y-min.box.y)) + y.max*(4/3)
+  }
+
   mid.x <- (2/5)*(3/8)*x.max
   shift.x <- (3/4)*mid.x
-  boxplot(homo.vec.sc, 
+  boxplot(homo1.vec.sc, 
           hetero.vec.sc,
-          width=rep(1, 2), 
+          homo2.vec.sc,
+          width=rep(1, 3), 
           boxwex=(1/15)*x.max, 
           outline=FALSE, 
           col="white",
           add=TRUE, 
           border=border.col,
-          at=c(mid.x-shift.x, mid.x+shift.x), names=NA, yaxt="n", xaxt="n")
-  if (back.allele=="A") {
-    text(x=mid.x-shift.x, y=y.max*(5/4), labels="A/A", cex=0.8, col=border.col)
-  }
-  else {
-    text(x=mid.x-shift.x, y=y.max*(5/4), labels="B/B", cex=0.8, col=border.col)
-  }
-  text(x=mid.x+shift.x, y=y.max*(5/4), labels="A/B", cex=0.8, col=border.col)
+          at=c(mid.x-shift.x, mid.x, mid.x+shift.x), names=NA, yaxt="n", xaxt="n")
+  text(x=mid.x-shift.x, y=y.max*(5/4), labels="A/A", cex=0.8, col=border.col)
+  text(x=mid.x, y=y.max*(5/4), labels="A/B", cex=0.8, col=border.col)
+  text(x=mid.x+shift.x, y=y.max*(5/4), labels="B/B", cex=0.8, col=border.col)
   text(x=mid.x+(1/2)*shift.x, y=2*y.max-(1/15)*y.max, labels="Phenotypes", cex=1.1, col=border.col)
 }
 
