@@ -43,15 +43,21 @@ update.tau <- function(K, prior.alpha, prior.beta, par.vec)
 #' @export
 diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str, n.iter, burn.in, multi.chain=1, thin=1,
                           sigma.2.starter=5, taua.starter=2, taud.starter=2, tauo.starter=2, taue.starter=2,
-                          strains.reorder=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"), 
+                          strains.rename=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
+                          strains.reorder=rev(c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")), 
                           use.constraint=TRUE)
 {
+  # Defining strain columns and incidence matrices
+  if(!is.null(strains.rename)) {
+    mother.str <- factor(mother.str, labels=strains.rename)
+    father.str <- factor(father.str, labels=strains.rename)
+  }
+  
   strains <- unique(c(as.character(mother.str), as.character(father.str)))
   num.strains <- length(strains)
-  # Defining strain columns and incidence matrices
   if (!is.null(strains.reorder)){
-    mother.str <- factor(mother.str, levels=strains)
-    father.str <- factor(father.str, levels=strains)
+    mother.str <- factor(mother.str, levels=strains.reorder)
+    father.str <- factor(father.str, levels=strains.reorder)
   }
   else {
     mother.str <- factor(mother.str)

@@ -1,7 +1,7 @@
 # Plots out effect intervals for diallel data
 #' @export
 caterpillar.plot <- function(gibbs.object, 
-                             name=NULL, 
+                             override.title=NULL,
                              include.effect.types=c("mu", "female", "add", "mat", "inbred", "epi", "var"),
                              col=c("black", "black", "dodgerblue2", "forestgreen", "darkorange2", "darkorchid1", "black"),
                              inbred.penalty.col="firebrick2",
@@ -39,9 +39,12 @@ caterpillar.plot <- function(gibbs.object,
   means.data <- as.vector(apply(mcmc.object, 2, function(x) mean(x)))
   median.data <- as.vector(apply(mcmc.object, 2, function(x) median(x)))
   
-  titlename = strsplit(deparse(substitute(mcmc.object)), ".", fixed=TRUE)[1]
-  if (!is.null(name)) {
-    titlename=name
+  if (!is.null(override.title)) {
+    title <- override.title
+  }
+  else {
+    titlename = strsplit(deparse(substitute(gibbs.object)), ".", fixed=TRUE)[[1]][1]
+    title <- paste(titlename, "parameters")
   }
   
   # Window limits
@@ -52,16 +55,16 @@ caterpillar.plot <- function(gibbs.object,
     this.x.lim <- c(min(ci95.data, na.rm=TRUE), max(ci95.data, na.rm=TRUE))
   }
 
-  plot(ci95.data[1, 1:2], c(1,1), panel.first = abline(h = 1, lty = 3, col = "gray88"), 
-       type = "l", ylim = c(0, num.var+1), main = paste(titlename, "parameters"), 
-       xlim = this.x.lim, xlab = "HPD intervals of strain effects and model parameters", 
-       ylab = "", yaxt = "n", lty=1, lwd=1, col = use.color[1], frame.plot=FALSE)
+  plot(ci95.data[1, 1:2], c(1,1), panel.first=abline(h=1, lty=3, col="gray88"), 
+       type="l", ylim=c(0, num.var+1), main=title, 
+       xlim=this.x.lim, xlab="HPD intervals of strain effects and model parameters", 
+       ylab="", yaxt="n", lty=1, lwd=1, col=use.color[1], frame.plot=FALSE)
   if (length(ci95.data[1,]) > 2){
     for (i in seq(3, length(ci95.data[1,])-1, by=2)) {
       lines(ci95.data[1, c(i,i+1)], c(1,1), lty=1, lwd=1, col=use.color[1], lend=2)
     }
   }
-  lines(ci50.data[1, 1:2], c(1,1), lty=1, lwd=5, col=use.color[1])
+  lines(ci50.data[1, 1:2], c(1,1), lty=1, lwd=3, col=use.color[1], lend=2)
   if (length(ci50.data[1,]) > 2){
     for (i in seq(3, length(ci50.data[1,])-1, by=2)) {
       lines(ci50.data[1, c(i,i+1)], c(1,1), lty=1, lwd=3, col=use.color[1], lend=2)
