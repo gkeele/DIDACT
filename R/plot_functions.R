@@ -5,7 +5,8 @@ caterpillar.plot <- function(gibbs.object,
                              include.effect.types=c("mu", "female", "add", "mat", "inbred", "epi", "var"),
                              col=c("black", "black", "dodgerblue2", "forestgreen", "darkorange2", "darkorchid1", "black"),
                              inbred.penalty.col="firebrick2",
-                             manual.limits=NULL){
+                             manual.limits=NULL,
+                             override.col=NULL){
   mcmc.object <- gibbs.object$mcmc
   
    # Processing the plotted variables
@@ -29,6 +30,10 @@ caterpillar.plot <- function(gibbs.object,
       use.color <- c(use.color, rep(col[i], sum(temp.include.col)))
     }
     reorder.names <- c(reorder.names, colnames(mcmc.object)[temp.include.col])
+  }
+  
+  if (!is.null(override.col)) {
+    use.color <- override.col
   }
   
   mcmc.object <- mcmc.object[,reorder.names]
@@ -160,6 +165,7 @@ diallelPlotter <- function(results,
                            border.col="black",
                            median.line.col="black",
                            absolute.density.scale=TRUE,
+                           include.info.plot=TRUE,
                            ...){
   cross.type <- cross.type[1]
   eu.list <- results$eu
@@ -203,12 +209,17 @@ diallelPlotter <- function(results,
       if (cross.type == "f2"){
         if (i == j) {
           if (i == 1) {
-            infoPlotter(trait=pheno.name, 
+            if (include.info.plot) {
+              infoPlotter(trait=pheno.name, 
                           experiment=cross.type,
                           n=n,
                           spectrum=spectrum, 
                           qtl.num=qtl.num,
                           include.widgets=include.widgets)
+            }
+            else {
+              emptyPlotter(include.off.x=include.off.x)
+            }
           }
           else if (i == 2) {
             if (include.widgets) {
@@ -245,12 +256,17 @@ diallelPlotter <- function(results,
       else if (cross.type == "bc") {
         if (i == j) {
           if (i == 1) {
-            infoPlotter(trait=pheno.name, 
+            if (include.info.plot) {
+              infoPlotter(trait=pheno.name, 
                           experiment=cross.type,
                           n=n,
                           spectrum=spectrum, 
                           qtl.num=qtl.num,
                           include.widgets=include.widgets)
+            }
+            else {
+              emptyPlotter(include.off.x=include.off.x)
+            }
           }
           else if (i == 2) {
             if (include.widgets) {
@@ -300,12 +316,17 @@ diallelPlotter <- function(results,
       else if (cross.type == "rbc1") {
         if (i == j){
           if (i == 1) {
-            infoPlotter(trait=pheno.name, 
-                        experiment=cross.type,
-                        n=n,
-                        spectrum=spectrum, 
-                        qtl.num=qtl.num,
-                        include.widgets=include.widgets)
+            if (include.info.plot) {
+              infoPlotter(trait=pheno.name, 
+                          experiment=cross.type,
+                          n=n,
+                          spectrum=spectrum, 
+                          qtl.num=qtl.num,
+                          include.widgets=include.widgets)
+            }
+            else {
+              emptyRBC1Plotter()
+            }
           }
           else if (i == 2) {
             if (include.widgets) {
@@ -358,12 +379,17 @@ diallelPlotter <- function(results,
       else if (cross.type == "rbc2") {
         if (i == j) {
           if (i == 1) {
-            infoPlotter(trait=pheno.name, 
-                        experiment=cross.type, 
-                        n=n, 
-                        spectrum=spectrum, 
-                        qtl.num=qtl.num,
-                        include.widgets=include.widgets)
+            if (include.info.plot) {
+              infoPlotter(trait=pheno.name, 
+                          experiment=cross.type, 
+                          n=n, 
+                          spectrum=spectrum, 
+                          qtl.num=qtl.num,
+                          include.widgets=include.widgets)
+            }
+            else {
+              emptyRBC2Plotter()
+            }
           }
           else if (i == 2) {
             if (include.widgets) {
@@ -501,8 +527,7 @@ infoPlotter <- function(trait,
                         experiment,
                         n, 
                         spectrum, 
-                        qtl.num=1,
-                        include.widgets=TRUE){
+                        qtl.num=1){
   plot(NA, xlim=c(0,1), ylim=c(0,1), xlab="", ylab="", frame=FALSE, xaxt="n", yaxt="n")
   
   if (experiment == "f2") { this.experiment <- "F2" }
@@ -520,9 +545,6 @@ infoPlotter <- function(trait,
           border=FALSE, space=FALSE, axes=FALSE, add=TRUE)
   axis(1, at=0:qtl.num, labels=0:qtl.num, tick=TRUE, cex.axis=1.2)
   text(x=0.5, 0.2, labels="Posterior mean utility", cex=1.3)
-  # if (include.widgets) {
-  #      
-  # }
 }
 
 f2boxPlotter <- function(homo1.vec, 
@@ -694,3 +716,19 @@ oneParamPlotter <- function(cross.u,
   }
 }
 
+#' @export
+make.big.info.plot <- function(trait,
+                               experiment,
+                               n,
+                               col.spectrum,
+                               qtl.num=1){
+  
+  ## Setting color spectrum
+  spectrum <- make.spectrum(col.spectrum=col.spectrum, n=1000)
+  
+  infoPlotter(trait=trait,
+              experiment=experiment,
+              n=n,
+              spectrum=spectrum,
+              qtl.num=qtl.num)
+}
