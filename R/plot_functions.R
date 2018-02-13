@@ -214,8 +214,7 @@ diallelPlotter <- function(results,
                           experiment=cross.type,
                           n=n,
                           spectrum=spectrum, 
-                          qtl.num=qtl.num,
-                          include.widgets=include.widgets)
+                          qtl.num=qtl.num)
             }
             else {
               emptyPlotter(include.off.x=include.off.x)
@@ -261,8 +260,7 @@ diallelPlotter <- function(results,
                           experiment=cross.type,
                           n=n,
                           spectrum=spectrum, 
-                          qtl.num=qtl.num,
-                          include.widgets=include.widgets)
+                          qtl.num=qtl.num)
             }
             else {
               emptyPlotter(include.off.x=include.off.x)
@@ -321,8 +319,7 @@ diallelPlotter <- function(results,
                           experiment=cross.type,
                           n=n,
                           spectrum=spectrum, 
-                          qtl.num=qtl.num,
-                          include.widgets=include.widgets)
+                          qtl.num=qtl.num)
             }
             else {
               emptyRBC1Plotter()
@@ -384,8 +381,7 @@ diallelPlotter <- function(results,
                           experiment=cross.type, 
                           n=n, 
                           spectrum=spectrum, 
-                          qtl.num=qtl.num,
-                          include.widgets=include.widgets)
+                          qtl.num=qtl.num)
             }
             else {
               emptyRBC2Plotter()
@@ -438,18 +434,22 @@ diallelPlotter <- function(results,
       }
       if (j %in% label.indices & i == 1) {
         if (include.biparent.labels) {
-          mtext(paste(ifelse(is.null(strains.relabel), strains[j], strains.relabel[j]), "(B)"), side=3, cex=1.1)
+          mtext(paste(ifelse(is.null(strains.relabel), strains[j], strains.relabel[j]), "(B)"), 
+                side=3, cex=1.1, padj=-0.3)
         }
         else {
-          mtext(ifelse(is.null(strains.relabel), strains[j], strains.relabel[j]), side=3, cex=1.1)
+          mtext(ifelse(is.null(strains.relabel), strains[j], strains.relabel[j]), 
+                side=3, cex=1.1, padj=-0.3)
         }
       }
       if (i %in% label.indices & j == 1) {
         if (include.biparent.labels) {
-          mtext(paste(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), "(A)"), side=2, cex=1.1)
+          mtext(paste(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), "(A)"), 
+                side=2, cex=1.1, padj=-0.3)
         }
         else {
-          mtext(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), side=3, cex=1.1)
+          mtext(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), 
+                side=3, cex=1.1, padj=-0.3)
         }
       }
     }
