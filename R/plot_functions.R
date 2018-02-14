@@ -5,11 +5,12 @@ caterpillar.plot <- function(gibbs.object,
                              include.effect.types=c("mu", "female", "add", "mat", "inbred", "epi", "var"),
                              col=c("black", "black", "dodgerblue2", "forestgreen", "darkorange2", "darkorchid1", "black"),
                              inbred.penalty.col="firebrick2",
+                             rev.strain.output=TRUE,
                              manual.limits=NULL,
                              override.col=NULL){
   mcmc.object <- gibbs.object$mcmc
   
-   # Processing the plotted variables
+  # Processing the plotted variables
   reorder.names <- NULL
   include.col <- rep(FALSE, ncol(mcmc.object))
   use.color <- NULL
@@ -23,13 +24,17 @@ caterpillar.plot <- function(gibbs.object,
     else {
       temp.include.col <- grepl(x=colnames(mcmc.object), pattern=include.effect.types[i]) & !grepl(x=colnames(mcmc.object), pattern="tau|sigma")
     }
+    temp.include.col.int <- which(temp.include.col)
+    if (rev.strain.output) {
+      temp.include.col.int <- rev(temp.include.col.int)
+    }
     if (include.effect.types[i] == "inbred") {
       use.color <- c(use.color, c(inbred.penalty.col, rep(col[i], sum(temp.include.col) - 1)))
     }
     else {
       use.color <- c(use.color, rep(col[i], sum(temp.include.col)))
     }
-    reorder.names <- c(reorder.names, colnames(mcmc.object)[temp.include.col])
+    reorder.names <- c(reorder.names, colnames(mcmc.object)[temp.include.col.int])
   }
   
   if (!is.null(override.col)) {

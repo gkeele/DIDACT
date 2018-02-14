@@ -43,18 +43,10 @@ update.tau <- function(K, prior.alpha, prior.beta, par.vec)
 #' @export
 diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str, n.iter, burn.in, multi.chain=1, thin=1,
                           sigma.2.starter=5, taua.starter=2, taud.starter=2, tauo.starter=2, taue.starter=2,
+                          strains.reorder=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
                           strains.rename=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
-                          strains.reorder=rev(c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")), 
                           use.constraint=TRUE)
 {
-  # Defining strain columns and incidence matrices
-  if(!is.null(strains.rename)) {
-    mother.str <- factor(mother.str, labels=strains.rename)
-    father.str <- factor(father.str, labels=strains.rename)
-  }
-  
-  strains <- unique(c(as.character(mother.str), as.character(father.str)))
-  num.strains <- length(strains)
   if (!is.null(strains.reorder)){
     mother.str <- factor(mother.str, levels=strains.reorder)
     father.str <- factor(father.str, levels=strains.reorder)
@@ -63,6 +55,21 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
     mother.str <- factor(mother.str)
     father.str <- factor(father.str)
   }
+
+  # Defining strain columns and incidence matrices
+  if(!is.null(strains.rename)) {
+    mother.str <- factor(mother.str, labels=strains.rename)
+    father.str <- factor(father.str, labels=strains.rename)
+  }
+  
+  # if (rev.order) {
+  #   mother.str <- factor(mother.str, levels=rev(strains.reorder))
+  #   father.str <- factor(father.str, levels=rev(strains.reorder))
+  # }
+  
+  strains <- unique(c(as.character(mother.str), as.character(father.str)))
+  num.strains <- length(strains)
+
   mom.mat <- incidence.matrix(mother.str)
   pop.mat <- incidence.matrix(father.str)
   
@@ -232,10 +239,10 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
   # Return matrix or list of matrix
   if (multi.chain > 1) {
     return(list(mcmc=coda::as.mcmc.list(chain.list),
-                strains=strains))
+                strains=levels(mother.str)))
   }
   else {
     return(list(mcmc=coda::as.mcmc(p.mat),
-                strains=strains))
+                strains=levels(mother.str)))
   }
 }
