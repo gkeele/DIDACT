@@ -454,7 +454,7 @@ diallelPlotter <- function(results,
         }
         else {
           mtext(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), 
-                side=3, cex=1.1, padj=-0.3)
+                side=2, cex=1.1, padj=-0.3)
         }
       }
     }
