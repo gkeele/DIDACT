@@ -3,8 +3,8 @@
 caterpillar.plot <- function(gibbs.object, 
                              override.title=NULL,
                              include.effect.types=c("mu", "female", "add", "mat", "inbred", "epi", "var"),
-                             col=c("black", "black", "dodgerblue2", "forestgreen", "darkorange2", "darkorchid1", "black"),
-                             inbred.penalty.col="firebrick2",
+                             col=c("black", "black", "#A6CEE3", "#B2DF8A", "#FDBF6F", "#CAB2D6", "black"),
+                             inbred.penalty.col="#FB9A99",
                              rev.strain.output=TRUE,
                              manual.limits=NULL,
                              override.col=NULL){
@@ -242,7 +242,8 @@ diallelPlotter <- function(results,
         }      	
         else {
           oneParamPlotter(cross.u=eu.list[[paste(strains[i], "x", strains[j], "-f2_eu", sep="")]],
-                          cross.type="f2", qtl.perc=median(var.list[[paste(strains[i], "x", strains[j], "-f2_perc", sep="")]]),
+                          cross.type="f2", 
+                          qtl.perc=median(var.list[[paste(strains[i], "x", strains[j], "-f2_perc", sep="")]]),
                           qtl.num=qtl.num, 
                           homo1.vec=pheno.list[[paste(strains[i], "x", strains[j], "-f2-hom1", sep="")]],
                           homo2.vec=pheno.list[[paste(strains[i], "x", strains[j], "-f2-hom2", sep="")]],
@@ -406,11 +407,11 @@ diallelPlotter <- function(results,
         }
         else {
           if (i < j) {
-            oneParamPlotter(eu.list[[paste(strains[i], "x", strains[j], "-rbc2_1_eu", sep="")]],
-                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[i], "x", strains[j], "-rbc2_1_perc", sep="")]]),
-                            homo1.vec=pheno.list[[paste(strains[i], "x", strains[j], "-rbc2_1-hom", sep="")]],
-                            hetero.vec=pheno.list[[paste(strains[i], "x", strains[j], "-rbc2_1-het", sep="")]],
-                            qtl.num=qtl.num, back.allele="B",
+            oneParamPlotter(eu.list[[paste(strains[i], "x", strains[j], "-rbc1_2_eu", sep="")]],
+                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[i], "x", strains[j], "-rbc1_2_perc", sep="")]]),
+                            homo1.vec=pheno.list[[paste(strains[i], "x", strains[j], "-rbc1_2-hom", sep="")]],
+                            hetero.vec=pheno.list[[paste(strains[i], "x", strains[j], "-rbc1_2-het", sep="")]],
+                            qtl.num=qtl.num, back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
@@ -421,11 +422,11 @@ diallelPlotter <- function(results,
                             ...)              		
           }
           else {
-            oneParamPlotter(eu.list[[paste(strains[j], "x", strains[i], "-rbc1_2_eu", sep="")]],
-                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[j], "x", strains[i], "-rbc1_2_perc", sep="")]]),
-                            homo1.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc1_2-hom", sep="")]],
-                            hetero.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc1_2-het", sep="")]],
-                            qtl.num=qtl.num, back.allele="B",
+            oneParamPlotter(eu.list[[paste(strains[j], "x", strains[i], "-rbc2_1_eu", sep="")]],
+                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[j], "x", strains[i], "-rbc2_1_perc", sep="")]]),
+                            homo1.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc2_1-hom", sep="")]],
+                            hetero.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc2_1-het", sep="")]],
+                            qtl.num=qtl.num, back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
@@ -725,9 +726,10 @@ oneParamPlotter <- function(cross.u,
 make.big.info.plot <- function(trait,
                                experiment,
                                n,
-                               col.spectrum,
+                               col.spectrum=c("blue2red", "gray", "green2red", "blue2green"),
                                qtl.num=1){
   
+  col.spectrum <- col.spectrum[1]
   ## Setting color spectrum
   spectrum <- make.spectrum(col.spectrum=col.spectrum, n=1000)
   
@@ -737,3 +739,54 @@ make.big.info.plot <- function(trait,
               spectrum=spectrum,
               qtl.num=qtl.num)
 }
+
+#' @export
+make.single.cross.plot <- function(cross,
+                                   cross.type,
+                                   utility.object,
+                                   col.spectrum=c("blue2red", "gray", "green2red", "blue2green"),
+                                   include.widgets=TRUE,
+                                   ...){
+  col.spectrum <- col.spectrum[1]
+  ## Setting color spectrum
+  spectrum <- make.spectrum(col.spectrum=col.spectrum, n=1000)
+  
+  if (cross.type == "f2") {
+    this.cross <- paste(cross, cross.type, sep="-")
+    oneParamPlotter(cross.u=utility.object$eu[[paste(this.cross, "eu", sep="_")]],
+                    cross.type=cross.type,
+                    qtl.perc=median(utility.object$var[[paste(this.cross, "perc", sep="_")]]),
+                    qtl.num=utility.object$qtl.num,
+                    homo1.vec=utility.object$pheno[[paste(this.cross, "hom1", sep="-")]],
+                    homo2.vec=utility.object$pheno[[paste(this.cross, "hom2", sep="-")]],
+                    hetero.vec=utility.object$pheno[[paste(this.cross, "het", sep="-")]],
+                    spectrum=spectrum,
+                    include.widgets=include.widgets,
+                    ...)
+  }
+}
+
+
+
+oneParamPlotter <- function(cross.u, 
+                            cross.type, 
+                            qtl.perc, 
+                            qtl.num=1, 
+                            cross.label1="", 
+                            cross.label2="",
+                            homo1.vec, 
+                            homo2.vec=NULL, 
+                            hetero.vec, 
+                            back.allele=NULL,
+                            include.x.axis=FALSE,
+                            spectrum,
+                            absolute.max=NULL,
+                            include.density,
+                            include.widgets,
+                            density.col="gray",
+                            border.col="black",
+                            median.line.col="black",
+                            ...){
+  
+
+
