@@ -746,6 +746,7 @@ make.single.cross.plot <- function(cross,
                                    utility.object,
                                    col.spectrum=c("blue2red", "gray", "green2red", "blue2green"),
                                    include.widgets=TRUE,
+                                   include.density=TRUE,
                                    ...){
   col.spectrum <- col.spectrum[1]
   ## Setting color spectrum
@@ -762,6 +763,7 @@ make.single.cross.plot <- function(cross,
                     hetero.vec=utility.object$pheno[[paste(this.cross, "het", sep="-")]],
                     spectrum=spectrum,
                     include.widgets=include.widgets,
+                    include.density=include.density,
                     ...)
   }
 }
