@@ -769,26 +769,3 @@ make.single.cross.plot <- function(cross,
 }
 
 
-
-oneParamPlotter <- function(cross.u, 
-                            cross.type, 
-                            qtl.perc, 
-                            qtl.num=1, 
-                            cross.label1="", 
-                            cross.label2="",
-                            homo1.vec, 
-                            homo2.vec=NULL, 
-                            hetero.vec, 
-                            back.allele=NULL,
-                            include.x.axis=FALSE,
-                            spectrum,
-                            absolute.max=NULL,
-                            include.density,
-                            include.widgets,
-                            density.col="gray",
-                            border.col="black",
-                            median.line.col="black",
-                            ...){
-  
-
-
