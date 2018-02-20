@@ -711,7 +711,7 @@ oneParamPlotter <- function(cross.u,
     }
   }
   if (include.density) {
-    hist(cross.u, col=density.col, breaks=seq(0, x.high, by=0.05), ylim=c(0, y.max), xlim=c(0, x.high), add=TRUE, freq=FALSE)
+    hist(cross.u, col=density.col, breaks=seq(0, x.high, by=0.05), ylim=c(0, y.max), xlim=c(0, x.high), add=TRUE, freq=FALSE, border=border.col)
     lines(x=c(post.median, post.median), y=c(0, max.y), lty=5, lwd=2, col=median.line.col)
   }
   if (cross.label1 != "" & cross.label2 != "") {
