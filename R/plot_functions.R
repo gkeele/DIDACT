@@ -29,7 +29,7 @@ caterpillar.plot <- function(gibbs.object,
       temp.include.col.int <- rev(temp.include.col.int)
     }
     if (include.effect.types[i] == "inbred") {
-      use.color <- c(use.color, c(inbred.penalty.col, rep(col[i], sum(temp.include.col) - 1)))
+      use.color <- c(use.color, c(rep(col[i], sum(temp.include.col) - 1), inbred.penalty.col))
     }
     else {
       use.color <- c(use.color, rep(col[i], sum(temp.include.col)))
@@ -157,6 +157,7 @@ diallel.phenotype.scale <- function(mother.str.var, father.str.var, phenotype, d
 diallelPlotter <- function(results, 
                            cross.type=c("f2", "bc", "rbc1", "rbc2"), 
                            pheno.name="", 
+                           col.range=c("white", "black"),
                            col.spectrum=c("blue2red", "gray", "green2red", "blue2green"),
                            path=NULL,
                            height=12,
@@ -193,7 +194,7 @@ diallelPlotter <- function(results,
   }
   
   ## Setting color spectrum
-  spectrum <- make.spectrum(col.spectrum=col.spectrum, n=1000)
+  spectrum <- make.spectrum(col.range=col.range, col.spectrum=col.spectrum, n=1000)
   
   # Placing labels
   label.indices <- 1:num.strains
@@ -467,12 +468,18 @@ diallelPlotter <- function(results,
 
 
 ################## Component plots of Moonrise plot
-make.spectrum <- function(col.spectrum, n=1000) {
-  if (col.spectrum == "gray") {
-    spectrum <- gray(level=n:1/n)
+make.spectrum <- function(col.range, col.spectrum, n=1000) {
+  if (is.null(col.range)) {
+    if (col.spectrum == "gray") {
+      spectrum <- gray(level=n:1/n)
+    }
+    else {
+      spectrum <- do.call(what=eval(parse(text=paste0("colorRamps::", col.spectrum))), args=list(n=n))
+    }
   }
   else {
-    spectrum <- do.call(what=eval(parse(text=paste0("colorRamps::", col.spectrum))), args=list(n=n))
+    spectrum <- colorRampPalette(col.range)
+    spectrum <- spectrum(n)
   }
   return(spectrum)
 }

@@ -111,7 +111,7 @@ calc.phenotypes.f2 <- function(line.m,
   homo.m <- par.vec["mu"] + 2*m.a.effect + par.vec["inbred penalty"] + m.i.effect
   homo.p <- par.vec["mu"] + 2*p.a.effect + par.vec["inbred penalty"] + p.i.effect
   hetero <- par.vec["mu"] + m.a.effect + p.a.effect + e.effect
-  phenos <- cbind(homo.m, homo.p, hetero)
+  phenos <- cbind(homo.m, hetero, homo.p)
   colnames(phenos) <- c("f2-hom1", "f2-het", "f2-hom2")
   return(phenos)
 }
