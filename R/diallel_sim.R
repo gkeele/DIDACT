@@ -1,4 +1,4 @@
-#' @export
+#' @export simulate.diallel
 simulate.diallel <- function(M=8,
                              mu=10, inbred.mu=-5, female.mu=-2,
                              add.size, inbred.size, epistatic.size, maternal.size=0, 
