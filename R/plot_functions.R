@@ -99,11 +99,12 @@ caterpillar.plot <- function(gibbs.object,
 #' @export
 diallel.phenotype.map <- function(mother.str.var, father.str.var, phenotype, data,
                                   phenotype.title=NULL,
+                                  do.reorder=TRUE,
                                   strains.reorder=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
                                   strain.names=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
                                   strain.colors=c("#F0F000", "#808080", "#F08080", "#1010F0", 
                                                   "#00A0F0", "#00A000", "#F00000", "#9000E0")){
-  if (!is.null(strains.reorder)) {
+  if (do.reorder) {
     data[,mother.str.var] <- factor(data[,mother.str.var], levels=strains.reorder)
     data[,father.str.var] <- factor(data[,father.str.var], levels=strains.reorder)
   }
@@ -751,6 +752,7 @@ make.big.info.plot <- function(trait,
 make.single.cross.plot <- function(cross,
                                    cross.type,
                                    utility.object,
+                                   col.range=c("white", "black"),
                                    col.spectrum=c("blue2red", "gray", "green2red", "blue2green"),
                                    include.widgets=TRUE,
                                    include.density=TRUE,
@@ -758,7 +760,7 @@ make.single.cross.plot <- function(cross,
                                    ...){
   col.spectrum <- col.spectrum[1]
   ## Setting color spectrum
-  spectrum <- make.spectrum(col.spectrum=col.spectrum, n=1000)
+  spectrum <- make.spectrum(col.range=col.range, col.spectrum=col.spectrum, n=1000)
   
   this.cross <- paste(cross, cross.type, sep="-")
   this.cross.u <- utility.object$eu[[paste(this.cross, "eu", sep="_")]]
