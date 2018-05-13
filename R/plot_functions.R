@@ -175,7 +175,7 @@ diallelPlotter <- function(results,
                            include.info.plot=TRUE,
                            ...){
   cross.type <- cross.type[1]
-  eu.list <- results$eu
+  power.list <- results$power
   pheno.list <- results$pheno
   var.list <- results$var
   qtl.num <- results$qtl.num
@@ -186,11 +186,11 @@ diallelPlotter <- function(results,
   
   absolute.max <- NULL
   if (absolute.density.scale) {
-    for (i in which(grepl(x=names(eu.list), pattern=cross.type))) {
-      absolute.max <- max(absolute.max,
-                          max(hist(eu.list[[i]], 
-                                   plot=FALSE, 
-                                   breaks=seq(0, qtl.num, length.out=20))$density))
+    for (i in grep(x=names(power.list), pattern=cross.type, value=TRUE)) {
+      absolute.max <- 1.05*max(absolute.max,
+                               max(unlist(lapply(power.list[[i]], function(x) max(hist(x,
+                                                                                  plot=FALSE, 
+                                                                                  breaks=seq(0, qtl.num, length.out=20))$density)))))
     }
   }
   
@@ -199,9 +199,6 @@ diallelPlotter <- function(results,
   
   # Placing labels
   label.indices <- 1:num.strains
-  if (pheno.name=="") {
-    pheno.name <- strsplit(deparse(substitute(eu.list)), split=".", fixed=T)[[1]][1]
-  }
   if (!is.null(path)) {
     pdf(paste0(path,"/Diallel_", pheno.name, "_", cross.type, "_", qtl.num, "qtl.pdf"),
         width=12, height=12)    
@@ -213,7 +210,7 @@ diallelPlotter <- function(results,
   ## CHOOSE SUBSET OF DATA
   for (i in 1:num.strains) {
     for (j in 1:num.strains) {
-      if (cross.type == "f2"){
+      if (cross.type == "f2") {
         if (i == j) {
           if (i == 1) {
             if (include.info.plot) {
@@ -243,13 +240,13 @@ diallelPlotter <- function(results,
           emptyPlotter(include.off.x=include.off.x)
         }      	
         else {
-          oneParamPlotter(cross.u=eu.list[[paste(strains[i], "x", strains[j], "-f2_eu", sep="")]],
+          oneParamPlotter(cross.power=power.list$f2[[paste(strains[i], strains[j], sep="x")]],
                           cross.type="f2", 
-                          qtl.perc=median(var.list[[paste(strains[i], "x", strains[j], "-f2_perc", sep="")]]),
+                          qtl.perc=median(var.list$f2[[paste(strains[i], strains[j],  sep="x")]]),
                           qtl.num=qtl.num, 
-                          hom1.vec=pheno.list[[paste(strains[i], "x", strains[j], "-f2-hom1", sep="")]],
-                          hom2.vec=pheno.list[[paste(strains[i], "x", strains[j], "-f2-hom2", sep="")]],
-                          het.vec=pheno.list[[paste(strains[i], "x", strains[j], "-f2-het", sep="")]],
+                          hom1.vec=pheno.list$f2[[paste(strains[i], strains[j],  sep="x")]],
+                          hom2.vec=pheno.list$f2[[paste(strains[i], strains[j],  sep="x")]],
+                          het.vec=pheno.list$f2[[paste(strains[i], strains[j],  sep="x")]],
                           spectrum=spectrum,
                           include.density=include.density,
                           include.widgets=include.widgets,
@@ -288,10 +285,11 @@ diallelPlotter <- function(results,
         }
         else {
           if (i < j) { ## Upper diag plots
-            oneParamPlotter(eu.list[[paste(strains[i], "x", strains[j], "-bc1_eu", sep="")]],
-                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[i], "x", strains[j], "-bc1_perc", sep="")]]),
-                            hom1.vec=pheno.list[[paste(strains[i], "x", strains[j], "-bc1-hom", sep="")]],
-                            het.vec=pheno.list[[paste(strains[i], "x", strains[j], "-bc1-het", sep="")]],
+            oneParamPlotter(power.list$bc1[[paste(strains[i], strains[j],  sep="x")]],
+                            cross.type="bc", 
+                            qtl.perc=median(var.list$bc1[[paste(strains[i], strains[j],  sep="x")]]),
+                            hom1.vec=pheno.list$bc1[[paste(strains[i], strains[j],  sep="x")]],
+                            het.vec=pheno.list$bc1[[paste(strains[i], strains[j],  sep="x")]],
                             qtl.num=qtl.num, back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
@@ -303,10 +301,11 @@ diallelPlotter <- function(results,
                             ...)          				
           }
           else { ## Lower diag plots
-            oneParamPlotter(eu.list[[paste(strains[j], "x", strains[i], "-bc2_eu", sep="")]],
-                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[j], "x", strains[i], "-bc2_perc", sep="")]]),
-                            hom1.vec=pheno.list[[paste(strains[j], "x", strains[i], "-bc2-hom", sep="")]],
-                            het.vec=pheno.list[[paste(strains[j], "x", strains[i], "-bc2-het", sep="")]],
+            oneParamPlotter(power.list$bc2[[paste(strains[j], strains[i],  sep="x")]],
+                            cross.type="bc", 
+                            qtl.perc=median(var.list$bc2[[paste(strains[j], strains[i],  sep="x")]]),
+                            hom1.vec=pheno.list$bc2[[paste(strains[j], strains[i],  sep="x")]],
+                            het.vec=pheno.list$bc2[[paste(strains[j], strains[i],  sep="x")]],
                             qtl.num=qtl.num, back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
@@ -348,10 +347,11 @@ diallelPlotter <- function(results,
         }
         else {
           if (i < j) { ## Upper diagonal
-            oneParamPlotter(eu.list[[paste(strains[i], "x", strains[j], "-rbc1_1_eu", sep="")]],
-                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[i], "x", strains[j], "-rbc1_1_perc", sep="")]]),
-                            hom1.vec=pheno.list[[paste(strains[i], "x", strains[j], "-rbc1_1-hom", sep="")]],
-                            het.vec=pheno.list[[paste(strains[i], "x", strains[j], "-rbc1_1-het", sep="")]],
+            oneParamPlotter(power.list$rbc1_1[[paste(strains[i], strains[j], sep="x")]],
+                            cross.type="bc", 
+                            qtl.perc=median(var.list$rbc1_1[[paste(strains[i], strains[j], sep="x")]]),
+                            hom1.vec=pheno.list$rbc1_1[[paste(strains[i], strains[j], sep="x")]],
+                            het.vec=pheno.list$rbc1_1[[paste(strains[i], strains[j], sep="x")]],
                             qtl.num=qtl.num, 
                             back.allele="A",
                             spectrum=spectrum,
@@ -364,10 +364,11 @@ diallelPlotter <- function(results,
                             ...)            			
           }
           else { ## Lower diagonal
-            oneParamPlotter(eu.list[[paste(strains[j], "x", strains[i], "-rbc2_2_eu", sep="")]],
-                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[j], "x", strains[i], "-rbc2_2_perc", sep="")]]),
-                            hom1.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc2_2-hom", sep="")]],
-                            het.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc2_2-het", sep="")]],
+            oneParamPlotter(power.list$rbc2_2[[paste(strains[j], strains[i], sep="x")]],
+                            cross.type="bc", 
+                            qtl.perc=median(var.list$rbc2_2[[paste(strains[j], strains[i], sep="x")]]),
+                            hom1.vec=pheno.list$rbc2_2[[paste(strains[j], strains[i], sep="x")]],
+                            het.vec=pheno.list$rbc2_2[[paste(strains[j], strains[i], sep="x")]],
                             qtl.num=qtl.num, 
                             back.allele="A",
                             spectrum=spectrum,
@@ -409,10 +410,11 @@ diallelPlotter <- function(results,
         }
         else {
           if (i < j) {
-            oneParamPlotter(eu.list[[paste(strains[i], "x", strains[j], "-rbc1_2_eu", sep="")]],
-                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[i], "x", strains[j], "-rbc1_2_perc", sep="")]]),
-                            hom1.vec=pheno.list[[paste(strains[i], "x", strains[j], "-rbc1_2-hom", sep="")]],
-                            het.vec=pheno.list[[paste(strains[i], "x", strains[j], "-rbc1_2-het", sep="")]],
+            oneParamPlotter(power.list$rbc1_2[[paste(strains[i], strains[j], sep="x")]],
+                            cross.type="bc", 
+                            qtl.perc=median(var.list$rbc1_2[[paste(strains[i], strains[j], sep="x")]]),
+                            hom1.vec=pheno.list$rbc1_2[[paste(strains[i], strains[j], sep="x")]],
+                            het.vec=pheno.list$rbc1_2[[paste(strains[i], strains[j], sep="x")]],
                             qtl.num=qtl.num, back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
@@ -424,10 +426,11 @@ diallelPlotter <- function(results,
                             ...)              		
           }
           else {
-            oneParamPlotter(eu.list[[paste(strains[j], "x", strains[i], "-rbc2_1_eu", sep="")]],
-                            cross.type="bc", qtl.perc=median(var.list[[paste(strains[j], "x", strains[i], "-rbc2_1_perc", sep="")]]),
-                            hom1.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc2_1-hom", sep="")]],
-                            het.vec=pheno.list[[paste(strains[j], "x", strains[i], "-rbc2_1-het", sep="")]],
+            oneParamPlotter(power.list$rbc2_1[[paste(strains[j], strains[i], sep="x")]],
+                            cross.type="bc", 
+                            qtl.perc=median(var.list$rbc2_1[[paste(strains[j], strains[i], sep="x")]]),
+                            hom1.vec=pheno.list$rbc2_1[[paste(strains[j], strains[i], sep="x")]],
+                            het.vec=pheno.list$rbc2_1[[paste(strains[j], strains[i], sep="x")]],
                             qtl.num=qtl.num, back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
@@ -461,7 +464,7 @@ diallelPlotter <- function(results,
         }
       }
     }
-  } 
+  }
   if (!is.null(path)) {
     dev.off()
   }
@@ -631,7 +634,7 @@ bcboxPlotter <- function(hom.vec,
   text(x=mid.x+(1/2)*shift.x, y=2*y.max-(1/15)*y.max, labels="Phenotypes", cex=1.1, col=border.col)
 }
 
-oneParamPlotter <- function(cross.u, 
+oneParamPlotter <- function(cross.power, 
                             cross.type, 
                             qtl.perc, 
                             qtl.num=1, 
@@ -651,12 +654,13 @@ oneParamPlotter <- function(cross.u,
                             median.line.col="black",
                             ...){
   x.high <- qtl.num
-  post.mean <- mean(cross.u)
-  post.median <- median(cross.u)
+  post.mean <- mean(cross.power)
+  post.median <- median(cross.power)
   bgcolor <- spectrum[round((post.mean/x.high)*length(spectrum))]
-  n <- length(cross.u)
+  n <- length(cross.power)
   if (is.null(absolute.max)) {
-    max.y <- max(hist(cross.u, plot=FALSE, breaks=seq(0, x.high, length.out=20))$density)
+    browser()
+    max.y <- max(hist(cross.power, plot=FALSE, breaks=seq(0, x.high, length.out=20))$density)
   }
   else {
     max.y <- absolute.max
@@ -719,7 +723,7 @@ oneParamPlotter <- function(cross.u,
     }
   }
   if (include.density) {
-    hist(cross.u, col=density.col, breaks=seq(0, x.high, by=0.05), ylim=c(0, y.max), xlim=c(0, x.high), add=TRUE, freq=FALSE, border=border.col)
+    hist(cross.power, col=density.col, breaks=seq(0, x.high, by=0.05), ylim=c(0, y.max), xlim=c(0, x.high), add=TRUE, freq=FALSE, border=border.col)
     lines(x=c(post.median, post.median), y=c(0, max.y), lty=5, lwd=2, col=median.line.col)
   }
   if (cross.label1 != "" & cross.label2 != "") {
@@ -751,7 +755,7 @@ make.big.info.plot <- function(trait,
 #' @export
 make.single.cross.plot <- function(cross,
                                    cross.type,
-                                   utility.object,
+                                   didact.object,
                                    col.range=c("white", "black"),
                                    col.spectrum=c("blue2red", "gray", "green2red", "blue2green"),
                                    include.widgets=TRUE,
@@ -762,18 +766,17 @@ make.single.cross.plot <- function(cross,
   ## Setting color spectrum
   spectrum <- make.spectrum(col.range=col.range, col.spectrum=col.spectrum, n=1000)
   
-  this.cross <- paste(cross, cross.type, sep="-")
-  this.cross.u <- utility.object$eu[[paste(this.cross, "eu", sep="_")]]
-  this.qtl.perc <- median(utility.object$var[[paste(this.cross, "perc", sep="_")]])
-  this.hom1.vec <- utility.object$pheno[[paste(this.cross, "hom1", sep="-")]]
-  this.het.vec <- utility.object$pheno[[paste(this.cross, "het", sep="-")]]
+  this.cross.power <- didact.object$power[[cross.type]][[cross]]
+  this.qtl.perc <- median(didact.object$var[[cross.type]][[cross]])
+  this.hom1.vec <- didact.object$pheno[[cross.type]][["hom1"]][[cross]]
+  this.het.vec <- didact.object$pheno[[cross.type]][["het"]][[cross]]
   if (cross.type == "f2") {
-    this.hom2.vec <- utility.object$pheno[[paste(this.cross, "hom2", sep="-")]]
+    this.hom2.vec <- didact.object$pheno[[cross.type]][["hom2"]][[cross]]
   }
   else if (cross.type == "bc") {
     this.hom2.vec <- NULL
   }
-  oneParamPlotter(cross.u=this.cross.u,
+  oneParamPlotter(cross.power=this.cross.power,
                   cross.type=cross.type,
                   qtl.perc=this.qtl.perc,
                   qtl.num=utility.object$qtl.num,

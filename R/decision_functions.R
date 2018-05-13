@@ -569,7 +569,7 @@ eu.grinder.general <- function(c.list){
   
   # Processing output
   eu.mat <- cbind(bc1, rbc1_1, rbc1_2, bc2, rbc2_1, rbc2_2, f2)
-  colnames(eu.mat) <- c("bc1_eu", "rbc1_1_eu", "rbc1_2_eu", "bc2_eu", "rbc2_1_eu", "rbc2_2_eu", "f2_eu")
+  colnames(eu.mat) <- c("bc1", "rbc1_1", "rbc1_2", "bc2", "rbc2_1", "rbc2_2", "f2")
   return(eu.mat)
 }
 
@@ -601,39 +601,58 @@ evaluate.experiments <- function(gibbs.object,
   pheno.list <- par.bundle[[2]]
   power.list <- par.bundle[[1]]
   u.list <- lapply(power.list, function(x) utility.runner.general(x, qtl.num=qtl.num))
-  eu.list <- lapply(u.list, function(x) eu.grinder.general(x))
-  
+  power.list <- lapply(u.list, function(x) eu.grinder.general(x))
+
   # Initializing output lists
-  eu.exp.list <- list()
-  var.exp.list <- list()
-  pheno.exp.list <- list()
+  power.exp.list <- var.exp.list <- list(f2=list(),
+                                         bc1=list(),
+                                         bc2=list(),
+                                         rbc1_1=list(),
+                                         rbc1_2=list(),
+                                         rbc2_1=list(),
+                                         rbc2_2=list())
+  pheno.exp.list <- list(f2=list(hom1=list(),
+                                 hom2=list(),
+                                 het=list()),
+                         bc1=list(hom1=list(),
+                                  het=list()),
+                         bc2=list(hom1=list(),
+                                  het=list()),
+                         rbc1_1=list(hom1=list(),
+                                     het=list()),
+                         rbc1_2=list(hom1=list(),
+                                     het=list()),
+                         rbc2_1=list(hom1=list(),
+                                     het=list()),
+                         rbc2_2=list(hom1=list(),
+                                     het=list()))
   
-  eu.counter <- 0
-  var.counter <- 0
-  pheno.counter <- 0
   
-  for (i in 1:15) {
+  exp.type <- colnames(power.list[[1]])
+  cross.type <- rownames(power.list[[1]])
+  
+  for (i in 1:length(exp.type)) {
     for (j in 1:choose(num.strains, 2)) {
-      if (i < 8) {
-        # utility
-        eu.experiment <- as.numeric(do.call(c, lapply(eu.list, function(x) picker(x, j, i))))  
-        eu.counter <- eu.counter + 1     
-        eu.exp.list[[eu.counter]] <- eu.experiment
-        names(eu.exp.list)[eu.counter] <- paste(rownames(eu.list[[1]])[j], "-", colnames(eu.list[[1]])[i], sep="")
-        # variance
-        var.experiment <- as.numeric(do.call(c, lapply(var.list, function(x) picker(x, j, i))))
-        var.counter <- var.counter + 1   
-        var.exp.list[[var.counter]] <- var.experiment
-        names(var.exp.list)[var.counter] <- paste(rownames(var.list[[1]])[j], "-", colnames(var.list[[1]])[i], sep="")
-      }
-      # effect
-      pheno.experiment <- as.numeric(do.call(c, lapply(pheno.list, function(x) picker(x, j, i))))
-      pheno.counter <- pheno.counter + 1   
-      pheno.exp.list[[pheno.counter]] <- pheno.experiment
-      names(pheno.exp.list)[pheno.counter] <- paste(rownames(pheno.list[[1]])[j], "-", colnames(pheno.list[[1]])[i], sep="")
+      # utility
+      power.experiment <- as.numeric(do.call(c, lapply(power.list, function(x) picker(x, j, i))))
+      power.exp.list[[exp.type[i]]][[cross.type[j]]] <- power.experiment
+      # variance
+      var.experiment <- as.numeric(do.call(c, lapply(var.list, function(x) picker(x, j, i))))
+      var.exp.list[[exp.type[i]]][[cross.type[j]]] <- var.experiment
     }
   }
-  results <- list(eu=eu.exp.list, 
+
+  pheno.type <- colnames(pheno.list[[1]])
+  for (i in 1:length(pheno.type)) {
+    this.exp <- strsplit(pheno.type, split="-", fixed=TRUE)[[i]][1]
+    this.pheno <- strsplit(pheno.type, split="-", fixed=TRUE)[[i]][2]
+    for (j in 1:choose(num.strains, 2)) {
+      # effect
+      pheno.experiment <- as.numeric(do.call(c, lapply(pheno.list, function(x) picker(x, j, i))))
+      pheno.exp.list[[this.exp]][[this.pheno]][[cross.type[j]]] <- pheno.experiment
+    }
+  }
+  results <- list(power=power.exp.list, 
                   pheno=pheno.exp.list, 
                   var=var.exp.list, 
                   qtl.num=qtl.num, 
