@@ -156,6 +156,7 @@ diallel.phenotype.scale <- function(mother.str.var, father.str.var, phenotype, d
 ######################## Plot for all crosses
 #' @export
 diallelPlotter <- function(results, 
+                           utility.type=c("power", "contrasts"),
                            cross.type=c("f2", "bc", "rbc1", "rbc2"), 
                            pheno.name="", 
                            col.range=c("white", "black"),
@@ -175,7 +176,14 @@ diallelPlotter <- function(results,
                            include.info.plot=TRUE,
                            ...){
   cross.type <- cross.type[1]
-  power.list <- results$power
+  utility.type <- utility.type[1]
+  
+  if (utility.type == "power") {
+    utility.list <- results$power
+  }
+  else {
+    utility.list <- results$var
+  }
   pheno.list <- results$pheno
   var.list <- results$var
   qtl.num <- results$qtl.num
@@ -186,11 +194,12 @@ diallelPlotter <- function(results,
   
   absolute.max <- NULL
   if (absolute.density.scale) {
-    for (i in grep(x=names(power.list), pattern=cross.type, value=TRUE)) {
-      absolute.max <- 1.05*max(absolute.max,
-                               max(unlist(lapply(power.list[[i]], function(x) max(hist(x,
-                                                                                  plot=FALSE, 
-                                                                                  breaks=seq(0, qtl.num, length.out=20))$density)))))
+    for (i in grep(x=names(utility.list), pattern=cross.type, value=TRUE)) {
+      qtl.num <- ifelse(utility.type == "power", qtl.num, 100)
+      absolute.max <- max(absolute.max,
+                          1.05*max(unlist(lapply(utility.list[[i]], function(x) max(hist(x,
+                                                                                         plot=FALSE, 
+                                                                                         breaks=seq(0, qtl.num, length.out=20))$density)))))
     }
   }
   
@@ -218,6 +227,7 @@ diallelPlotter <- function(results,
                           experiment=cross.type,
                           n=n,
                           spectrum=spectrum, 
+                          utility.type=utility.type,
                           qtl.num=qtl.num)
             }
             else {
@@ -240,7 +250,7 @@ diallelPlotter <- function(results,
           emptyPlotter(include.off.x=include.off.x)
         }      	
         else {
-          oneParamPlotter(cross.power=power.list$f2[[paste(strains[i], strains[j], sep="x")]],
+          oneParamPlotter(cross.utility=utility.list$f2[[paste(strains[i], strains[j], sep="x")]],
                           cross.type="f2", 
                           qtl.perc=median(var.list$f2[[paste(strains[i], strains[j],  sep="x")]]),
                           qtl.num=qtl.num, 
@@ -265,6 +275,7 @@ diallelPlotter <- function(results,
                           experiment=cross.type,
                           n=n,
                           spectrum=spectrum, 
+                          utility.type=utility.type,
                           qtl.num=qtl.num)
             }
             else {
@@ -285,7 +296,7 @@ diallelPlotter <- function(results,
         }
         else {
           if (i < j) { ## Upper diag plots
-            oneParamPlotter(power.list$bc1[[paste(strains[i], strains[j],  sep="x")]],
+            oneParamPlotter(utility.list$bc1[[paste(strains[i], strains[j],  sep="x")]],
                             cross.type="bc", 
                             qtl.perc=median(var.list$bc1[[paste(strains[i], strains[j],  sep="x")]]),
                             hom1.vec=pheno.list$bc1[[paste(strains[i], strains[j],  sep="x")]],
@@ -301,7 +312,7 @@ diallelPlotter <- function(results,
                             ...)          				
           }
           else { ## Lower diag plots
-            oneParamPlotter(power.list$bc2[[paste(strains[j], strains[i],  sep="x")]],
+            oneParamPlotter(utility.list$bc2[[paste(strains[j], strains[i],  sep="x")]],
                             cross.type="bc", 
                             qtl.perc=median(var.list$bc2[[paste(strains[j], strains[i],  sep="x")]]),
                             hom1.vec=pheno.list$bc2[[paste(strains[j], strains[i],  sep="x")]],
@@ -326,6 +337,7 @@ diallelPlotter <- function(results,
                           experiment=cross.type,
                           n=n,
                           spectrum=spectrum, 
+                          utility.type=utility.type,
                           qtl.num=qtl.num)
             }
             else {
@@ -347,7 +359,7 @@ diallelPlotter <- function(results,
         }
         else {
           if (i < j) { ## Upper diagonal
-            oneParamPlotter(power.list$rbc1_1[[paste(strains[i], strains[j], sep="x")]],
+            oneParamPlotter(utility.list$rbc1_1[[paste(strains[i], strains[j], sep="x")]],
                             cross.type="bc", 
                             qtl.perc=median(var.list$rbc1_1[[paste(strains[i], strains[j], sep="x")]]),
                             hom1.vec=pheno.list$rbc1_1[[paste(strains[i], strains[j], sep="x")]],
@@ -364,7 +376,7 @@ diallelPlotter <- function(results,
                             ...)            			
           }
           else { ## Lower diagonal
-            oneParamPlotter(power.list$rbc2_2[[paste(strains[j], strains[i], sep="x")]],
+            oneParamPlotter(utility.list$rbc2_2[[paste(strains[j], strains[i], sep="x")]],
                             cross.type="bc", 
                             qtl.perc=median(var.list$rbc2_2[[paste(strains[j], strains[i], sep="x")]]),
                             hom1.vec=pheno.list$rbc2_2[[paste(strains[j], strains[i], sep="x")]],
@@ -390,6 +402,7 @@ diallelPlotter <- function(results,
                           experiment=cross.type, 
                           n=n, 
                           spectrum=spectrum, 
+                          utility.type=utility.type,
                           qtl.num=qtl.num)
             }
             else {
@@ -410,7 +423,7 @@ diallelPlotter <- function(results,
         }
         else {
           if (i < j) {
-            oneParamPlotter(power.list$rbc1_2[[paste(strains[i], strains[j], sep="x")]],
+            oneParamPlotter(utility.list$rbc1_2[[paste(strains[i], strains[j], sep="x")]],
                             cross.type="bc", 
                             qtl.perc=median(var.list$rbc1_2[[paste(strains[i], strains[j], sep="x")]]),
                             hom1.vec=pheno.list$rbc1_2[[paste(strains[i], strains[j], sep="x")]],
@@ -426,7 +439,7 @@ diallelPlotter <- function(results,
                             ...)              		
           }
           else {
-            oneParamPlotter(power.list$rbc2_1[[paste(strains[j], strains[i], sep="x")]],
+            oneParamPlotter(utility.list$rbc2_1[[paste(strains[j], strains[i], sep="x")]],
                             cross.type="bc", 
                             qtl.perc=median(var.list$rbc2_1[[paste(strains[j], strains[i], sep="x")]]),
                             hom1.vec=pheno.list$rbc2_1[[paste(strains[j], strains[i], sep="x")]],
@@ -544,7 +557,8 @@ infoPlotter <- function(trait,
                         experiment,
                         n, 
                         spectrum, 
-                        qtl.num=1){
+                        qtl.num=1,
+                        utility.type){
   plot(NA, xlim=c(0,1), ylim=c(0,1), xlab="", ylab="", frame=FALSE, xaxt="n", yaxt="n")
   
   if (experiment == "f2") { this.experiment <- "F2" }
@@ -554,13 +568,16 @@ infoPlotter <- function(trait,
   
   text(x=0.1, y=0.9, labels=paste("Cross type:", this.experiment), adj=0, cex=1.2)
   text(x=0.1, y=0.8, labels=paste("Trait:", trait), adj=0, cex=1.2)
-  text(x=0.1, y=0.7, labels=paste("QTL number:", qtl.num), adj=0, cex=1.2)
-  text(x=0.1, y=0.6, labels=paste("Number of mice:", n), adj=0, cex=1.2)
+  text(x=0.1, y=0.7, labels=paste("Utility:", utility.type), adj=0, cex=1.2)
+  if (utility.type == "power") {
+    text(x=0.1, y=0.6, labels=paste("QTL number:", qtl.num), adj=0, cex=1.2)
+    text(x=0.1, y=0.5, labels=paste("Number of mice:", n), adj=0, cex=1.2)
+  }
   
   barplot(height=rep(0.1, length(spectrum)), width=1/length(spectrum), density=1000,
           angle=90, col=spectrum, 
           border=FALSE, space=FALSE, axes=FALSE, add=TRUE)
-  axis(1, at=0:qtl.num, labels=0:qtl.num, tick=TRUE, cex.axis=1.2)
+  axis(1, at=c(0,1), labels=c(0, qtl.num), tick=TRUE, cex.axis=1.2)
   text(x=0.5, 0.2, labels="Posterior mean utility", cex=1.3)
 }
 
@@ -634,7 +651,7 @@ bcboxPlotter <- function(hom.vec,
   text(x=mid.x+(1/2)*shift.x, y=2*y.max-(1/15)*y.max, labels="Phenotypes", cex=1.1, col=border.col)
 }
 
-oneParamPlotter <- function(cross.power, 
+oneParamPlotter <- function(cross.utility, 
                             cross.type, 
                             qtl.perc, 
                             qtl.num=1, 
@@ -654,13 +671,12 @@ oneParamPlotter <- function(cross.power,
                             median.line.col="black",
                             ...){
   x.high <- qtl.num
-  post.mean <- mean(cross.power)
-  post.median <- median(cross.power)
+  post.mean <- mean(cross.utility)
+  post.median <- median(cross.utility)
   bgcolor <- spectrum[round((post.mean/x.high)*length(spectrum))]
-  n <- length(cross.power)
+  n <- length(cross.utility)
   if (is.null(absolute.max)) {
-    browser()
-    max.y <- max(hist(cross.power, plot=FALSE, breaks=seq(0, x.high, length.out=20))$density)
+    max.y <- max(hist(cross.utility, plot=FALSE, breaks=seq(0, x.high, length.out=20))$density)
   }
   else {
     max.y <- absolute.max
@@ -723,7 +739,7 @@ oneParamPlotter <- function(cross.power,
     }
   }
   if (include.density) {
-    hist(cross.power, col=density.col, breaks=seq(0, x.high, by=0.05), ylim=c(0, y.max), xlim=c(0, x.high), add=TRUE, freq=FALSE, border=border.col)
+    hist(cross.utility, col=density.col, breaks=seq(0, x.high, length.out=20), ylim=c(0, y.max), xlim=c(0, x.high), add=TRUE, freq=FALSE, border=border.col)
     lines(x=c(post.median, post.median), y=c(0, max.y), lty=5, lwd=2, col=median.line.col)
   }
   if (cross.label1 != "" & cross.label2 != "") {
@@ -737,6 +753,7 @@ oneParamPlotter <- function(cross.power,
 #' @export
 make.big.info.plot <- function(trait,
                                experiment,
+                               utility.type,
                                n,
                                col.spectrum=c("blue2red", "gray", "green2red", "blue2green"),
                                qtl.num=1){
@@ -749,6 +766,7 @@ make.big.info.plot <- function(trait,
               experiment=experiment,
               n=n,
               spectrum=spectrum,
+              utility.type=utility.type,
               qtl.num=qtl.num)
 }
 
@@ -756,6 +774,7 @@ make.big.info.plot <- function(trait,
 make.single.cross.plot <- function(cross,
                                    cross.type,
                                    didact.object,
+                                   utility.type=c("power", "contrasts"),
                                    col.range=c("white", "black"),
                                    col.spectrum=c("blue2red", "gray", "green2red", "blue2green"),
                                    include.widgets=TRUE,
@@ -763,10 +782,17 @@ make.single.cross.plot <- function(cross,
                                    back.allele="A",
                                    ...){
   col.spectrum <- col.spectrum[1]
+  utility.type <- utility.type[1]
   ## Setting color spectrum
   spectrum <- make.spectrum(col.range=col.range, col.spectrum=col.spectrum, n=1000)
   
-  this.cross.power <- didact.object$power[[cross.type]][[cross]]
+  if (utility.type == "power") {
+    this.cross.utility <- didact.object$power[[cross.type]][[cross]]
+  }
+  else if (utility.type == "contrasts") {
+    this.cross.utility <- didact.object$var[[cross.type]][[cross]]
+  }
+  
   this.qtl.perc <- median(didact.object$var[[cross.type]][[cross]])
   this.hom1.vec <- didact.object$pheno[[cross.type]][["hom1"]][[cross]]
   this.het.vec <- didact.object$pheno[[cross.type]][["het"]][[cross]]
@@ -776,7 +802,7 @@ make.single.cross.plot <- function(cross,
   else if (cross.type == "bc") {
     this.hom2.vec <- NULL
   }
-  oneParamPlotter(cross.power=this.cross.power,
+  oneParamPlotter(cross.utility=this.cross.utility,
                   cross.type=cross.type,
                   qtl.perc=this.qtl.perc,
                   qtl.num=utility.object$qtl.num,
