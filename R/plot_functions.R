@@ -810,12 +810,12 @@ make.big.info.plot <- function(trait,
                                experiment,
                                utility.type,
                                n,
+                               col.range=c("white", "black"),
                                col.spectrum=c("blue2red", "gray", "green2red", "blue2green"),
                                qtl.num=1){
   
-  col.spectrum <- col.spectrum[1]
   ## Setting color spectrum
-  spectrum <- make.spectrum(col.spectrum=col.spectrum, n=1000)
+  spectrum <- make.spectrum(col.range=col.range, col.spectrum=col.spectrum, n=1000)
   
   infoPlotter(trait=trait,
               experiment=experiment,
@@ -841,7 +841,7 @@ make.single.cross.plot <- function(cross,
   utility.type <- utility.type[1]
   ## Setting color spectrum
   spectrum <- make.spectrum(col.range=col.range, col.spectrum=col.spectrum, n=1000)
-  
+
   if (utility.type == "power") {
     this.cross.utility <- didact.object$power[[cross.type]][[cross]]
   }
