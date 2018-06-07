@@ -2,8 +2,8 @@
 #' @export
 caterpillar.plot <- function(gibbs.object, 
                              override.title=NULL,
-                             include.effect.types=c("mu", "female", "add", "mat", "inbred", "epi", "var"),
-                             col=c("black", "black", "#A6CEE3", "#B2DF8A", "#FDBF6F", "#CAB2D6", "black"),
+                             include.effect.types=c("mu", "female", "add", "mat", "inbred", "epi_sym", "epi_asym", "var"),
+                             col=c("black", "black", "#A6CEE3", "#B2DF8A", "#FDBF6F", "#CAB2D6", "#D2B48C", "black"),
                              inbred.penalty.col="#FB9A99",
                              rev.strain.output=TRUE,
                              manual.limits=NULL,
@@ -64,7 +64,7 @@ caterpillar.plot <- function(gibbs.object,
   else {
     this.x.lim <- c(min(ci95.data, na.rm=TRUE), max(ci95.data, na.rm=TRUE))
   }
-
+  
   plot(ci95.data[1, 1:2], c(1,1), panel.first=abline(h=1, lty=3, col="gray88"), 
        type="l", ylim=c(0, num.var+1), main=title, 
        xlim=this.x.lim, xlab="HPD intervals of strain effects and model parameters", 
@@ -168,12 +168,16 @@ diallelPlotter <- function(results,
                            include.off.x=TRUE,
                            include.biparent.labels=TRUE,
                            include.density=TRUE,
-                           include.widgets=TRUE,
+                           include.var.pie=FALSE,
+                           include.bar.plots=TRUE,
                            density.col="white",
                            border.col="black",
                            median.line.col="black",
                            absolute.density.scale=TRUE,
                            include.info.plot=TRUE,
+                           include.rank=FALSE,
+                           rank=NULL,
+                           rank.col="red",
                            ...){
   cross.type <- cross.type[1]
   utility.type <- utility.type[1]
@@ -184,6 +188,8 @@ diallelPlotter <- function(results,
   else {
     utility.list <- results$var
   }
+  rank.list <- calc.ranks(utility.list=utility.list, cross.type=cross.type)
+
   pheno.list <- results$pheno
   var.list <- results$var
   qtl.num <- results$qtl.num
@@ -235,7 +241,7 @@ diallelPlotter <- function(results,
             }
           }
           else if (i == 2) {
-            if (include.widgets) {
+            if (include.var.pie) {
               legendPlotter()
             }
             else {
@@ -254,16 +260,20 @@ diallelPlotter <- function(results,
                           cross.type="f2", 
                           qtl.perc=median(var.list$f2[[paste(strains[i], strains[j],  sep="x")]]),
                           qtl.num=qtl.num, 
-                          hom1.vec=pheno.list$f2[[paste(strains[i], strains[j],  sep="x")]],
-                          hom2.vec=pheno.list$f2[[paste(strains[i], strains[j],  sep="x")]],
-                          het.vec=pheno.list$f2[[paste(strains[i], strains[j],  sep="x")]],
+                          hom1.vec=pheno.list$f2$hom1[[paste(strains[i], strains[j],  sep="x")]],
+                          hom2.vec=pheno.list$f2$hom2[[paste(strains[i], strains[j],  sep="x")]],
+                          het.vec=pheno.list$f2$het[[paste(strains[i], strains[j],  sep="x")]],
                           spectrum=spectrum,
                           include.density=include.density,
-                          include.widgets=include.widgets,
+                          include.var.pie=include.var.pie,
+                          include.bar.plots=include.bar.plots,
                           absolute.max=absolute.max,
                           density.col=density.col,
                           border.col=border.col,
                           median.line.col=median.line.col,
+                          include.rank=include.rank,
+                          rank=rank.list[["f2"]][[paste(strains[i], strains[j],  sep="x")]],
+                          rank.col=rank.col,
                           ...)
         }
       }	
@@ -283,7 +293,7 @@ diallelPlotter <- function(results,
             }
           }
           else if (i == 2) {
-            if (include.widgets) {
+            if (include.var.pie) {
               legendPlotter()
             }
             else {
@@ -299,32 +309,40 @@ diallelPlotter <- function(results,
             oneParamPlotter(utility.list$bc1[[paste(strains[i], strains[j],  sep="x")]],
                             cross.type="bc", 
                             qtl.perc=median(var.list$bc1[[paste(strains[i], strains[j],  sep="x")]]),
-                            hom1.vec=pheno.list$bc1[[paste(strains[i], strains[j],  sep="x")]],
-                            het.vec=pheno.list$bc1[[paste(strains[i], strains[j],  sep="x")]],
+                            hom1.vec=pheno.list$bc1$hom[[paste(strains[i], strains[j],  sep="x")]],
+                            het.vec=pheno.list$bc1$het[[paste(strains[i], strains[j],  sep="x")]],
                             qtl.num=qtl.num, back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
-                            include.widgets=include.widgets,
+                            include.var.pie=include.var.pie,
+                            include.bar.plots=include.bar.plots,
                             density.col=density.col,
                             border.col=border.col,
                             median.line.col=median.line.col,
+                            include.rank=include.rank,
+                            rank=rank.list[["bc1"]][[paste(strains[i], strains[j],  sep="x")]],
+                            rank.col=rank.col,
                             ...)          				
           }
           else { ## Lower diag plots
             oneParamPlotter(utility.list$bc2[[paste(strains[j], strains[i],  sep="x")]],
                             cross.type="bc", 
                             qtl.perc=median(var.list$bc2[[paste(strains[j], strains[i],  sep="x")]]),
-                            hom1.vec=pheno.list$bc2[[paste(strains[j], strains[i],  sep="x")]],
-                            het.vec=pheno.list$bc2[[paste(strains[j], strains[i],  sep="x")]],
+                            hom1.vec=pheno.list$bc2$hom[[paste(strains[j], strains[i],  sep="x")]],
+                            het.vec=pheno.list$bc2$het[[paste(strains[j], strains[i],  sep="x")]],
                             qtl.num=qtl.num, back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
-                            include.widgets=include.widgets,
+                            include.var.pie=include.var.pie,
+                            include.bar.plots=include.bar.plots,
                             density.col=density.col,
                             border.col=border.col,
                             median.line.col=median.line.col,
+                            include.rank=include.rank,
+                            rank=rank.list[["bc2"]][[paste(strains[j], strains[i],  sep="x")]],
+                            rank.col=rank.col,
                             ...)   				
           }
         }
@@ -345,7 +363,7 @@ diallelPlotter <- function(results,
             }
           }
           else if (i == 2) {
-            if (include.widgets) {
+            if (include.var.pie) {
               legendPlotter()
             }
             else {
@@ -362,34 +380,42 @@ diallelPlotter <- function(results,
             oneParamPlotter(utility.list$rbc1_1[[paste(strains[i], strains[j], sep="x")]],
                             cross.type="bc", 
                             qtl.perc=median(var.list$rbc1_1[[paste(strains[i], strains[j], sep="x")]]),
-                            hom1.vec=pheno.list$rbc1_1[[paste(strains[i], strains[j], sep="x")]],
-                            het.vec=pheno.list$rbc1_1[[paste(strains[i], strains[j], sep="x")]],
+                            hom1.vec=pheno.list$rbc1_1$hom[[paste(strains[i], strains[j], sep="x")]],
+                            het.vec=pheno.list$rbc1_1$het[[paste(strains[i], strains[j], sep="x")]],
                             qtl.num=qtl.num, 
                             back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
-                            include.widgets=include.widgets,
+                            include.var.pie=include.var.pie,
+                            include.bar.plots=include.bar.plots,
                             density.col=density.col,
                             border.col=border.col,
                             median.line.col=median.line.col,
+                            include.rank=include.rank,
+                            rank=rank.list[["rbc1_1"]][[paste(strains[i], strains[j],  sep="x")]],
+                            rank.col=rank.col,
                             ...)            			
           }
           else { ## Lower diagonal
             oneParamPlotter(utility.list$rbc2_2[[paste(strains[j], strains[i], sep="x")]],
                             cross.type="bc", 
                             qtl.perc=median(var.list$rbc2_2[[paste(strains[j], strains[i], sep="x")]]),
-                            hom1.vec=pheno.list$rbc2_2[[paste(strains[j], strains[i], sep="x")]],
-                            het.vec=pheno.list$rbc2_2[[paste(strains[j], strains[i], sep="x")]],
+                            hom1.vec=pheno.list$rbc2_2$hom[[paste(strains[j], strains[i], sep="x")]],
+                            het.vec=pheno.list$rbc2_2$het[[paste(strains[j], strains[i], sep="x")]],
                             qtl.num=qtl.num, 
                             back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
-                            include.widgets=include.widgets,
+                            include.var.pie=include.var.pie,
+                            include.bar.plots=include.bar.plots,
                             density.col=density.col,
                             border.col=border.col,
                             median.line.col=median.line.col,
+                            include.rank=include.rank,
+                            rank=rank.list[["rbc2_2"]][[paste(strains[j], strains[i],  sep="x")]],
+                            rank.col=rank.col,
                             ...)   				
           }
         }
@@ -410,7 +436,7 @@ diallelPlotter <- function(results,
             }
           }
           else if (i == 2) {
-            if (include.widgets) {
+            if (include.var.pie) {
               legendPlotter()
             }
             else{
@@ -426,32 +452,40 @@ diallelPlotter <- function(results,
             oneParamPlotter(utility.list$rbc1_2[[paste(strains[i], strains[j], sep="x")]],
                             cross.type="bc", 
                             qtl.perc=median(var.list$rbc1_2[[paste(strains[i], strains[j], sep="x")]]),
-                            hom1.vec=pheno.list$rbc1_2[[paste(strains[i], strains[j], sep="x")]],
-                            het.vec=pheno.list$rbc1_2[[paste(strains[i], strains[j], sep="x")]],
+                            hom1.vec=pheno.list$rbc1_2$hom[[paste(strains[i], strains[j], sep="x")]],
+                            het.vec=pheno.list$rbc1_2$het[[paste(strains[i], strains[j], sep="x")]],
                             qtl.num=qtl.num, back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
-                            include.widgets=include.widgets,
+                            include.var.pie=include.var.pie,
+                            include.bar.plots=include.bar.plots,
                             density.col=density.col,
                             border.col=border.col,
                             median.line.col=median.line.col,
+                            include.rank=include.rank,
+                            rank=rank.list[["rbc1_2"]][[paste(strains[i], strains[j],  sep="x")]],
+                            rank.col=rank.col,
                             ...)              		
           }
           else {
             oneParamPlotter(utility.list$rbc2_1[[paste(strains[j], strains[i], sep="x")]],
                             cross.type="bc", 
                             qtl.perc=median(var.list$rbc2_1[[paste(strains[j], strains[i], sep="x")]]),
-                            hom1.vec=pheno.list$rbc2_1[[paste(strains[j], strains[i], sep="x")]],
-                            het.vec=pheno.list$rbc2_1[[paste(strains[j], strains[i], sep="x")]],
+                            hom1.vec=pheno.list$rbc2_1$hom[[paste(strains[j], strains[i], sep="x")]],
+                            het.vec=pheno.list$rbc2_1$het[[paste(strains[j], strains[i], sep="x")]],
                             qtl.num=qtl.num, back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
-                            include.widgets=include.widgets,
+                            include.var.pie=include.var.pie,
+                            include.bar.plots=include.bar.plots,
                             density.col=density.col,
                             border.col=border.col,
                             median.line.col=median.line.col,
+                            include.rank=include.rank,
+                            rank=rank.list[["rbc2_1"]][[paste(strains[j], strains[i],  sep="x")]],
+                            rank.col=rank.col,
                             ...)   				
           }
         }
@@ -665,7 +699,11 @@ oneParamPlotter <- function(cross.utility,
                             spectrum,
                             absolute.max=NULL,
                             include.density,
-                            include.widgets,
+                            include.var.pie,
+                            include.bar.plots,
+                            include.rank,
+                            rank=NULL,
+                            rank.col="red",
                             density.col="gray",
                             border.col="black",
                             median.line.col="black",
@@ -685,7 +723,7 @@ oneParamPlotter <- function(cross.utility,
   min.y <- 0
   
   ## Adjusting plot window for widgets
-  if (include.widgets) {
+  if (include.var.pie | include.bar.plots) {
     y.max <- 1*(max.y - min.y) + max.y
   }
   else {
@@ -701,7 +739,7 @@ oneParamPlotter <- function(cross.utility,
   total.qtl <- round(qtl.perc, 1)
   total <- round(100 - total.qtl, 1)
 
-  if (include.widgets) {
+  if (include.var.pie) {
     if (qtl.num == 1) {
       mapplots::add.pie(z=c(qtl/100, total/100), labels=NA, x=0.5*x.high, y=0.75*y.max, radius=(3/10)*(9/10)*y.range, 
                         col=(c("white", "gray50")), cex=1.3, label.dist=1.2, border=border.col)
@@ -720,7 +758,8 @@ oneParamPlotter <- function(cross.utility,
            bty="n", 
            text.col=border.col, 
            cex=1.1)
-    
+  }
+  if (include.bar.plots) {
     if (cross.type == "f2") {
       f2boxPlotter(hom1.vec=hom1.vec, 
                    hom2.vec=hom2.vec, 
@@ -747,6 +786,9 @@ oneParamPlotter <- function(cross.utility,
   }
   if (include.x.axis) {
     axis(1, at=0:x.high, labels=TRUE, tick=TRUE, cex.axis=1.2)
+  }
+  if (include.rank) {
+    legend("topright", legend=rank, bty="n", text.col=rank.col, cex=2.5, text.font=1)
   }
 }
 
@@ -777,7 +819,8 @@ make.single.cross.plot <- function(cross,
                                    utility.type=c("power", "contrasts"),
                                    col.range=c("white", "black"),
                                    col.spectrum=c("blue2red", "gray", "green2red", "blue2green"),
-                                   include.widgets=TRUE,
+                                   include.var.pie=TRUE,
+                                   include.bar.plots=TRUE,
                                    include.density=TRUE,
                                    back.allele="A",
                                    ...){
@@ -794,12 +837,13 @@ make.single.cross.plot <- function(cross,
   }
   
   this.qtl.perc <- median(didact.object$var[[cross.type]][[cross]])
-  this.hom1.vec <- didact.object$pheno[[cross.type]][["hom1"]][[cross]]
   this.het.vec <- didact.object$pheno[[cross.type]][["het"]][[cross]]
   if (cross.type == "f2") {
+    this.hom1.vec <- didact.object$pheno[[cross.type]][["hom1"]][[cross]]
     this.hom2.vec <- didact.object$pheno[[cross.type]][["hom2"]][[cross]]
   }
   else if (cross.type == "bc") {
+    this.hom1.vec <- didact.object$pheno[[cross.type]][["hom"]][[cross]]
     this.hom2.vec <- NULL
   }
   oneParamPlotter(cross.utility=this.cross.utility,
@@ -810,10 +854,32 @@ make.single.cross.plot <- function(cross,
                   hom2.vec=this.hom2.vec,
                   het.vec=this.het.vec,
                   spectrum=spectrum,
-                  include.widgets=include.widgets,
+                  include.var.pie=include.var.pie,
+                  include.bar.plots=include.bar.plots,
                   include.density=include.density,
                   back.allele=back.allele,
                   ...)
+}
+
+calc.ranks <- function(utility.list,
+                       cross.type=c("f2", "bc", "rbc1", "rbc2")) {
+  rank.list <- list()
+  
+  rank.list$f2 <- as.list(rank(-unlist(lapply(utility.list$f2, function(x) mean(x)))))
+
+  rank.vec <- rank(-unlist(lapply(c(utility.list$bc1, utility.list$bc2), function(x) mean(x))))
+  rank.list$bc1 <- as.list(rank.vec[1:28])
+  rank.list$bc2 <- as.list(rank.vec[29:56])
+
+  rank.vec <- rank(-unlist(lapply(c(utility.list$rbc1_1, utility.list$rbc2_2), function(x) mean(x))))
+  rank.list$rbc1_1 <- as.list(rank.vec[1:28])
+  rank.list$rbc2_2 <- as.list(rank.vec[29:56])
+  
+  rank.vec <- rank(-unlist(lapply(c(utility.list$rbc1_2, utility.list$rbc2_1), function(x) mean(x))))
+  rank.list$rbc1_2 <- as.list(rank.vec[1:28])
+  rank.list$rbc2_1 <- as.list(rank.vec[29:56])
+  
+  return(rank.list)
 }
 
 

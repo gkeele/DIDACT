@@ -4,24 +4,26 @@ calc.f2.effects <- function(line.m,
                             par.vec, 
                             qtl.num=1,
                             strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
-  m.a.effect <- par.vec[paste(line.m, "add")]
-  p.a.effect <- par.vec[paste(line.p, "add")]
+  m.a.effect <- par.vec[paste("add", line.m, sep=":")]
+  p.a.effect <- par.vec[paste("add", line.p, sep=":")]
   i.effect <- par.vec["inbred penalty"]
-  m.i.effect <- par.vec[paste(line.m, "inbred")]
-  p.i.effect <- par.vec[paste(line.p, "inbred")]
+  m.i.effect <- par.vec[paste("inbred", line.m, sep=":")]
+  p.i.effect <- par.vec[paste("inbred", line.p, sep=":")]
   # Epistatic effects
   m.index <- which(line.m == strain.order)
   p.index <- which(line.p == strain.order)
   epi.indeces <- sort(c(m.index, p.index))
   if (m.index == p.index) {
-    e.effect <- par.vec[paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], "epi")]
+    e.sym.effect <- par.vec[paste("epi_sym", paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], sep=";"), sep=":")]
+    e.asym.effect <- par.vec[paste("epi_asym", paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], sep=";"), sep=":")]
   }
   else {
-    e.effect <- 0
+    e.sym.effect <- 0
+    e.asym.effect <- 0
   }
   homo.m <- 2*m.a.effect + i.effect + m.i.effect
   homo.p <- 2*p.a.effect + i.effect + p.i.effect
-  hetero <- m.a.effect + p.a.effect + e.effect
+  hetero <- m.a.effect + p.a.effect + e.sym.effect + e.asym.effect
   add <- (homo.m - homo.p)/2
   dom <- hetero - (homo.m + homo.p)/2
   effects <- c(add/qtl.num, dom/qtl.num)
@@ -33,22 +35,24 @@ calc.bc.effects <- function(re.cross.line,
                             par.vec, 
                             qtl.num=1,
                             strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
-  re.cross.a.effect <- par.vec[paste(re.cross.line, "add")]
-  other.line.a.effect <- par.vec[paste(other.line, "add")]
+  re.cross.a.effect <- par.vec[paste("add", re.cross.line, sep=":")]
+  other.line.a.effect <- par.vec[paste("add", other.line, sep=":")]
   i.effect <- par.vec["inbred penalty"]
-  re.cross.i.effect <- par.vec[paste(re.cross.line, "inbred")]
+  re.cross.i.effect <- par.vec[paste("inbred", re.cross.line, sep=":")]
   # Epistatic effects
   re.cross.index <- which(re.cross.line == strain.order)
   other.index <- which(other.line == strain.order)
   epi.indeces <- sort(c(re.cross.index, other.index))
   if (re.cross.index == other.index) {
-    e.effect <- par.vec[paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], "epi")]
+    e.sym.effect <- par.vec[paste("epi_sym", paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], sep=";"), sep=":")]
+    e.asym.effect <- par.vec[paste("epi_asym", paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], sep=";"), sep=":")]
   }
   else {
-    e.effect <- 0
+    e.sym.effect <- 0
+    e.asym.effect <- 0
   }
   homo.re <- 2*re.cross.a.effect + i.effect + re.cross.i.effect
-  hetero <- re.cross.a.effect + other.line.a.effect + e.effect
+  hetero <- re.cross.a.effect + other.line.a.effect + e.sym.effect + e.asym.effect
   add.dom <- hetero - homo.re
   effects <- add.dom/qtl.num
   return(effects)
@@ -66,24 +70,26 @@ calc.rbc.effects <- function(re.cross.line,
   else {
     pat.line <- re.cross.line
   }
-  re.cross.a.effect <- par.vec[paste(re.cross.line, "add")]
-  other.line.a.effect <- par.vec[paste(other.line, "add")]
+  re.cross.a.effect <- par.vec[paste("add", re.cross.line, sep=":")]
+  other.line.a.effect <- par.vec[paste("add", other.line, sep=":")]
   i.effect <- par.vec["inbred penalty"]
-  re.cross.i.effect <- par.vec[paste(re.cross.line, "inbred")]
-  mat.effect <- par.vec[paste(mat.line, "mat")]
-  pat.effect <- par.vec[paste(pat.line, "mat")]
+  re.cross.i.effect <- par.vec[paste("inbred", re.cross.line, sep=":")]
+  mat.effect <- par.vec[paste("mat", mat.line, sep=":")]
+  pat.effect <- par.vec[paste("mat", pat.line, sep=":")]
   # Epistatic effects
   re.cross.index <- which(re.cross.line == strain.order)
   other.index <- which(other.line == strain.order)
   epi.indeces <- sort(c(re.cross.index, other.index))
   if (re.cross.index == other.index) {
-    e.effect <- par.vec[paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], "epi")]
+    e.sym.effect <- par.vec[paste("epi_sym", paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], sep=";"), sep=":")]
+    e.asym.effect <- par.vec[paste("epi_asym", paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], sep=";"), sep=":")]
   }
   else {
-    e.effect <- 0
+    e.sym.effect <- 0
+    e.asym.effect <- 0
   }
   homo.re <- 2*re.cross.a.effect + i.effect + re.cross.i.effect
-  hetero <- re.cross.a.effect + other.line.a.effect + mat.effect - pat.effect + e.effect
+  hetero <- re.cross.a.effect + other.line.a.effect + mat.effect - pat.effect + e.sym.effect + e.asym.effect
   add.dom <- hetero - homo.re
   effects <- add.dom/qtl.num
   return(effects)
@@ -94,23 +100,25 @@ calc.phenotypes.f2 <- function(line.m,
                                par.vec, 
                                qtl.num=1,
                                strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
-  m.a.effect <- par.vec[paste(line.m, "add")]
-  p.a.effect <- par.vec[paste(line.p, "add")]
-  m.i.effect <- par.vec[paste(line.m, "inbred")]
-  p.i.effect <- par.vec[paste(line.p, "inbred")]
+  m.a.effect <- par.vec[paste("add", line.m, sep=":")]
+  p.a.effect <- par.vec[paste("add", line.p, sep=":")]
+  m.i.effect <- par.vec[paste("inbred", line.m, sep=":")]
+  p.i.effect <- par.vec[paste("inbred", line.p, sep=":")]
   # Epistatic effects
   m.index <- which(line.m == strain.order)
   p.index <- which(line.p == strain.order)
   epi.indeces <- sort(c(m.index, p.index))
   if (m.index == p.index) {
-    e.effect <- par.vec[paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], "epi")]
+    e.sym.effect <- par.vec[paste("epi_sym", paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], sep=";"), sep=":")]
+    e.asym.effect <- par.vec[paste("epi_asym", paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], sep=";"), sep=":")]
   }
   else {
-    e.effect <- 0
+    e.sym.effect <- 0
+    e.asym.effect <- 0
   }
   homo.m <- par.vec["mu"] + 2*m.a.effect + par.vec["inbred penalty"] + m.i.effect
   homo.p <- par.vec["mu"] + 2*p.a.effect + par.vec["inbred penalty"] + p.i.effect
-  hetero <- par.vec["mu"] + m.a.effect + p.a.effect + e.effect
+  hetero <- par.vec["mu"] + m.a.effect + p.a.effect + e.sym.effect + e.asym.effect
   phenos <- cbind(homo.m, hetero, homo.p)
   colnames(phenos) <- c("f2-hom1", "f2-het", "f2-hom2")
   return(phenos)
@@ -121,21 +129,23 @@ calc.phenotypes.bc <- function(re.cross.line,
                                qtl.num=1, 
                                cross.type="bc1",
                                strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
-  re.cross.a.effect <- par.vec[paste(re.cross.line, "add")]
-  other.a.effect <- par.vec[paste(other.line, "add")]
-  re.cross.i.effect <- par.vec[paste(re.cross.line, "inbred")]
+  re.cross.a.effect <- par.vec[paste("add", re.cross.line, sep=":")]
+  other.a.effect <- par.vec[paste("add", other.line, sep=":")]
+  re.cross.i.effect <- par.vec[paste("inbred", re.cross.line, sep=":")]
   # Epistatic effects
   re.cross.index <- which(re.cross.line == strain.order)
   other.index <- which(other.line == strain.order)
   epi.indeces <- sort(c(re.cross.index, other.index))
   if (re.cross.index == other.index) {
-    e.effect <- par.vec[paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], "epi")]
+    e.sym.effect <- par.vec[paste("epi_sym", paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], sep=";"), sep=":")]
+    e.asym.effect <- par.vec[paste("epi_asym", paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], sep=";"), sep=":")]
   }
   else {
-    e.effect <- 0
+    e.sym.effect <- 0
+    e.asym.effect <- 0
   }
   homo.re <- par.vec["mu"] + 2*re.cross.a.effect + par.vec["inbred penalty"] + re.cross.i.effect
-  hetero <- par.vec["mu"] + re.cross.a.effect + other.a.effect + e.effect
+  hetero <- par.vec["mu"] + re.cross.a.effect + other.a.effect + e.sym.effect + e.asym.effect
   phenos <- cbind(homo.re, hetero)
   if (cross.type == "bc1") {
     colnames(phenos) <- c("bc1-hom", "bc1-het")
@@ -160,23 +170,25 @@ calc.phenotypes.rbc <- function(re.cross.line,
   else {
     pat.line <- re.cross.line
   }
-  re.cross.a.effect <- par.vec[paste(re.cross.line, "add")]
-  other.a.effect <- par.vec[paste(other.line, "add")]
-  re.cross.i.effect <- par.vec[paste(re.cross.line, "inbred")]
+  re.cross.a.effect <- par.vec[paste("add", re.cross.line, sep=":")]
+  other.a.effect <- par.vec[paste("add", other.line, sep=":")]
+  re.cross.i.effect <- par.vec[paste("inbred", re.cross.line, sep=":")]
   # Epistatic effects
   re.cross.index <- which(re.cross.line == strain.order)
   other.index <- which(other.line == strain.order)
   epi.indeces <- sort(c(re.cross.index, other.index))
   if (re.cross.index == other.index) {
-    e.effect <- par.vec[paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], "epi")]
+    e.sym.effect <- par.vec[paste("epi_sym", paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], sep=";"), sep=":")]
+    e.asym.effect <- par.vec[paste("epi_asym", paste(strain.order[epi.indeces[1]], strain.order[epi.indeces[2]], sep=";"), sep=":")]
   }
   else {
-    e.effect <- 0
+    e.sym.effect <- 0
+    e.asym.effect <- 0
   }
-  mat.effect <- par.vec[paste(mat.line, "mat")]
-  pat.effect <- par.vec[paste(pat.line, "mat")]
+  mat.effect <- par.vec[paste("mat", mat.line, sep=":")]
+  pat.effect <- par.vec[paste("mat", pat.line, sep=":")]
   homo.re <- par.vec["mu"] + 2*re.cross.a.effect + par.vec["inbred penalty"] + re.cross.i.effect
-  hetero <- par.vec["mu"] + re.cross.a.effect + other.a.effect + mat.effect - pat.effect + e.effect
+  hetero <- par.vec["mu"] + re.cross.a.effect + other.a.effect + mat.effect - pat.effect + e.sym.effect + e.asym.effect
   phenos <- cbind(homo.re, hetero)
   if (cross.type=="rbc1_1") {
     colnames(phenos) <- c("rbc1_1-hom", "rbc1_1-het")
@@ -614,17 +626,17 @@ evaluate.experiments <- function(gibbs.object,
   pheno.exp.list <- list(f2=list(hom1=list(),
                                  hom2=list(),
                                  het=list()),
-                         bc1=list(hom1=list(),
+                         bc1=list(hom=list(),
                                   het=list()),
-                         bc2=list(hom1=list(),
+                         bc2=list(hom=list(),
                                   het=list()),
-                         rbc1_1=list(hom1=list(),
+                         rbc1_1=list(hom=list(),
                                      het=list()),
-                         rbc1_2=list(hom1=list(),
+                         rbc1_2=list(hom=list(),
                                      het=list()),
-                         rbc2_1=list(hom1=list(),
+                         rbc2_1=list(hom=list(),
                                      het=list()),
-                         rbc2_2=list(hom1=list(),
+                         rbc2_2=list(hom=list(),
                                      het=list()))
   
   
