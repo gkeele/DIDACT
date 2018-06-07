@@ -788,8 +788,21 @@ oneParamPlotter <- function(cross.utility,
     axis(1, at=0:x.high, labels=TRUE, tick=TRUE, cex.axis=1.2)
   }
   if (include.rank) {
-    legend("topright", legend=rank, bty="n", text.col=rank.col, cex=2.5, text.font=1)
+    #legend("topright", legend=rank, bty="n", text.col=rank.col, cex=2.5, text.font=1)
+    TeachingDemos_shadowtext(x=x.high*0.8, y=y.max*0.8, labels=rank, col=rank.col, cex=2.5, r=0.15)
   }
+}
+
+TeachingDemos_shadowtext <- function(x, y=NULL, labels, col='white', bg='black',
+                                     theta= seq(pi/4, 2*pi, length.out=8), r=0.1, ...) {
+  xy <- xy.coords(x,y)
+  xo <- r*strwidth('A')
+  yo <- r*strheight('A')
+  
+  for (i in theta) {
+    text(xy$x + cos(i)*xo, xy$y + sin(i)*yo, labels, col=bg, ...)
+  }
+  text(xy$x, xy$y, labels, col=col, ...) 
 }
 
 #' @export
