@@ -2,6 +2,7 @@
 #' @export
 caterpillar.plot <- function(gibbs.object, 
                              override.title=NULL,
+                             override.xlab=NULL,
                              include.effect.types=c("mu", "female", "add", "mat", "inbred", "epi_sym", "epi_asym", "var"),
                              col=c("black", "black", "#A6CEE3", "#B2DF8A", "#FDBF6F", "#CAB2D6", "#D2B48C", "black"),
                              inbred.penalty.col="#FB9A99",
@@ -65,9 +66,10 @@ caterpillar.plot <- function(gibbs.object,
     this.x.lim <- c(min(ci95.data, na.rm=TRUE), max(ci95.data, na.rm=TRUE))
   }
   
+  this.xlab <- ifelse(is.null(override.xlab), "HPD intervals of strain effects and model parameters", override.xlab)
   plot(ci95.data[1, 1:2], c(1,1), panel.first=abline(h=1, lty=3, col="gray88"), 
        type="l", ylim=c(0, num.var+1), main=title, 
-       xlim=this.x.lim, xlab="HPD intervals of strain effects and model parameters", 
+       xlim=this.x.lim, xlab=this.xlab, 
        ylab="", yaxt="n", lty=1, lwd=1, col=use.color[1], frame.plot=FALSE)
   if (length(ci95.data[1,]) > 2){
     for (i in seq(3, length(ci95.data[1,])-1, by=2)) {
@@ -92,7 +94,7 @@ caterpillar.plot <- function(gibbs.object,
   points(median.data, 1:num.var, pch="l", col="white")
   points(means.data, 1:num.var, pch="l", col=use.color)
   abline(v=0, lty=2, col="gray")
-  axis(2, c(1:num.var), par.names, c(1:num.var), las = 2, tck = -0.005, cex.axis = 0.5)
+  axis(2, c(1:num.var), par.names, c(1:num.var), line=-1.5, las=2, tck=-0.005, cex.axis=0.5)
 }
 
 ########## Diallel plots
@@ -197,15 +199,21 @@ diallelPlotter <- function(results,
   col.spectrum <- col.spectrum[1]
   strains <- results$strains
   num.strains <- length(strains)
-  
+  if (utility.type == "power") {
+    x.high <- qtl.num
+  }
+  else if (utility.type == "contrasts") {
+    x.high <- max(sapply(1:length(results$var), function(y) max(sapply(1:length(results$var[[y]]), function(x) max(results$var[[y]][[x]])))))
+  }
+
   absolute.max <- NULL
   if (absolute.density.scale) {
     for (i in grep(x=names(utility.list), pattern=cross.type, value=TRUE)) {
-      qtl.num <- ifelse(utility.type == "power", qtl.num, 100)
+      #x.high <- ifelse(utility.type == "power", qtl.num, 100)
       absolute.max <- max(absolute.max,
                           1.05*max(unlist(lapply(utility.list[[i]], function(x) max(hist(x,
                                                                                          plot=FALSE, 
-                                                                                         breaks=seq(0, qtl.num, length.out=20))$density)))))
+                                                                                         breaks=seq(0, x.high, length.out=20))$density)))))
     }
   }
   
@@ -234,7 +242,7 @@ diallelPlotter <- function(results,
                           n=n,
                           spectrum=spectrum, 
                           utility.type=utility.type,
-                          qtl.num=qtl.num)
+                          x.high=x.high)
             }
             else {
               emptyPlotter(include.off.x=include.off.x)
@@ -260,6 +268,7 @@ diallelPlotter <- function(results,
                           cross.type="f2", 
                           qtl.perc=median(var.list$f2[[paste(strains[i], strains[j],  sep="x")]]),
                           qtl.num=qtl.num, 
+                          x.high=x.high,
                           hom1.vec=pheno.list$f2$hom1[[paste(strains[i], strains[j],  sep="x")]],
                           hom2.vec=pheno.list$f2$hom2[[paste(strains[i], strains[j],  sep="x")]],
                           het.vec=pheno.list$f2$het[[paste(strains[i], strains[j],  sep="x")]],
@@ -286,7 +295,7 @@ diallelPlotter <- function(results,
                           n=n,
                           spectrum=spectrum, 
                           utility.type=utility.type,
-                          qtl.num=qtl.num)
+                          x.high=x.high)
             }
             else {
               emptyPlotter(include.off.x=include.off.x)
@@ -311,7 +320,9 @@ diallelPlotter <- function(results,
                             qtl.perc=median(var.list$bc1[[paste(strains[i], strains[j],  sep="x")]]),
                             hom1.vec=pheno.list$bc1$hom[[paste(strains[i], strains[j],  sep="x")]],
                             het.vec=pheno.list$bc1$het[[paste(strains[i], strains[j],  sep="x")]],
-                            qtl.num=qtl.num, back.allele="A",
+                            qtl.num=qtl.num, 
+                            x.high=x.high,
+                            back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
@@ -331,7 +342,9 @@ diallelPlotter <- function(results,
                             qtl.perc=median(var.list$bc2[[paste(strains[j], strains[i],  sep="x")]]),
                             hom1.vec=pheno.list$bc2$hom[[paste(strains[j], strains[i],  sep="x")]],
                             het.vec=pheno.list$bc2$het[[paste(strains[j], strains[i],  sep="x")]],
-                            qtl.num=qtl.num, back.allele="A",
+                            qtl.num=qtl.num, 
+                            x.high=x.high,
+                            back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
@@ -356,7 +369,7 @@ diallelPlotter <- function(results,
                           n=n,
                           spectrum=spectrum, 
                           utility.type=utility.type,
-                          qtl.num=qtl.num)
+                          x.high=x.high)
             }
             else {
               emptyRBC1Plotter()
@@ -383,6 +396,7 @@ diallelPlotter <- function(results,
                             hom1.vec=pheno.list$rbc1_1$hom[[paste(strains[i], strains[j], sep="x")]],
                             het.vec=pheno.list$rbc1_1$het[[paste(strains[i], strains[j], sep="x")]],
                             qtl.num=qtl.num, 
+                            x.high=x.high,
                             back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
@@ -404,6 +418,7 @@ diallelPlotter <- function(results,
                             hom1.vec=pheno.list$rbc2_2$hom[[paste(strains[j], strains[i], sep="x")]],
                             het.vec=pheno.list$rbc2_2$het[[paste(strains[j], strains[i], sep="x")]],
                             qtl.num=qtl.num, 
+                            x.high=x.high,
                             back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
@@ -429,7 +444,7 @@ diallelPlotter <- function(results,
                           n=n, 
                           spectrum=spectrum, 
                           utility.type=utility.type,
-                          qtl.num=qtl.num)
+                          x.high=x.high)
             }
             else {
               emptyRBC2Plotter()
@@ -454,7 +469,9 @@ diallelPlotter <- function(results,
                             qtl.perc=median(var.list$rbc1_2[[paste(strains[i], strains[j], sep="x")]]),
                             hom1.vec=pheno.list$rbc1_2$hom[[paste(strains[i], strains[j], sep="x")]],
                             het.vec=pheno.list$rbc1_2$het[[paste(strains[i], strains[j], sep="x")]],
-                            qtl.num=qtl.num, back.allele="A",
+                            qtl.num=qtl.num,
+                            x.high=x.high,
+                            back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
@@ -474,7 +491,9 @@ diallelPlotter <- function(results,
                             qtl.perc=median(var.list$rbc2_1[[paste(strains[j], strains[i], sep="x")]]),
                             hom1.vec=pheno.list$rbc2_1$hom[[paste(strains[j], strains[i], sep="x")]],
                             het.vec=pheno.list$rbc2_1$het[[paste(strains[j], strains[i], sep="x")]],
-                            qtl.num=qtl.num, back.allele="A",
+                            qtl.num=qtl.num, 
+                            x.high=x.high,
+                            back.allele="A",
                             spectrum=spectrum,
                             absolute.max=absolute.max,
                             include.density=include.density,
@@ -591,7 +610,7 @@ infoPlotter <- function(trait,
                         experiment,
                         n, 
                         spectrum, 
-                        qtl.num=1,
+                        x.high=1,
                         utility.type){
   plot(NA, xlim=c(0,1), ylim=c(0,1), xlab="", ylab="", frame=FALSE, xaxt="n", yaxt="n")
   
@@ -604,14 +623,14 @@ infoPlotter <- function(trait,
   text(x=0.1, y=0.8, labels=paste("Trait:", trait), adj=0, cex=1.2)
   text(x=0.1, y=0.7, labels=paste("Utility:", utility.type), adj=0, cex=1.2)
   if (utility.type == "power") {
-    text(x=0.1, y=0.6, labels=paste("QTL number:", qtl.num), adj=0, cex=1.2)
+    text(x=0.1, y=0.6, labels=paste("QTL number:", x.high), adj=0, cex=1.2)
     text(x=0.1, y=0.5, labels=paste("Number of mice:", n), adj=0, cex=1.2)
   }
   
   barplot(height=rep(0.1, length(spectrum)), width=1/length(spectrum), density=1000,
           angle=90, col=spectrum, 
           border=FALSE, space=FALSE, axes=FALSE, add=TRUE)
-  axis(1, at=c(0,1), labels=c(0, qtl.num), tick=TRUE, cex.axis=1.2)
+  axis(1, at=c(0,1), labels=c(0, x.high), tick=TRUE, cex.axis=1.2)
   text(x=0.5, 0.2, labels="Posterior mean utility", cex=1.3)
 }
 
@@ -688,7 +707,8 @@ bcboxPlotter <- function(hom.vec,
 oneParamPlotter <- function(cross.utility, 
                             cross.type, 
                             qtl.perc, 
-                            qtl.num=1, 
+                            qtl.num=1,
+                            x.high,
                             cross.label1="", 
                             cross.label2="",
                             hom1.vec, 
@@ -708,7 +728,6 @@ oneParamPlotter <- function(cross.utility,
                             border.col="black",
                             median.line.col="black",
                             ...){
-  x.high <- qtl.num
   post.mean <- mean(cross.utility)
   post.median <- median(cross.utility)
   bgcolor <- spectrum[round((post.mean/x.high)*length(spectrum))]
@@ -789,7 +808,7 @@ oneParamPlotter <- function(cross.utility,
   }
   if (include.rank) {
     #legend("topright", legend=rank, bty="n", text.col=rank.col, cex=2.5, text.font=1)
-    TeachingDemos_shadowtext(x=x.high*0.8, y=y.max*0.8, labels=rank, col=rank.col, cex=2.5, r=0.15)
+    TeachingDemos_shadowtext(x=x.high*0.8, y=y.max*0.8, labels=rank, col=rank.col, cex=5, r=0.15)
   }
 }
 
@@ -812,7 +831,7 @@ make.big.info.plot <- function(trait,
                                n,
                                col.range=c("white", "black"),
                                col.spectrum=c("blue2red", "gray", "green2red", "blue2green"),
-                               qtl.num=1){
+                               x.high=1){
   
   ## Setting color spectrum
   spectrum <- make.spectrum(col.range=col.range, col.spectrum=col.spectrum, n=1000)
@@ -822,7 +841,7 @@ make.big.info.plot <- function(trait,
               n=n,
               spectrum=spectrum,
               utility.type=utility.type,
-              qtl.num=qtl.num)
+              x.high=x.high)
 }
 
 #' @export
@@ -859,10 +878,19 @@ make.single.cross.plot <- function(cross,
     this.hom1.vec <- didact.object$pheno[[cross.type]][["hom"]][[cross]]
     this.hom2.vec <- NULL
   }
+  qtl.num <- didact.object$qtl.num
+  if (utility.type == "power") {
+    x.high <- qtl.num
+  }
+  else if (utility.type == "contrasts") {
+    x.high <- max(sapply(1:length(didact.object$var), function(y) max(sapply(1:length(didact.object$var[[y]]), function(x) max(didact.object$var[[y]][[x]])))))
+  }
+  #x.high <- ifelse(utility.type == "power", qtl.num, 100)
   oneParamPlotter(cross.utility=this.cross.utility,
                   cross.type=cross.type,
                   qtl.perc=this.qtl.perc,
-                  qtl.num=utility.object$qtl.num,
+                  qtl.num=qtl.num,
+                  x.high=x.high,
                   hom1.vec=this.hom1.vec,
                   hom2.vec=this.hom2.vec,
                   het.vec=this.het.vec,
@@ -870,6 +898,7 @@ make.single.cross.plot <- function(cross,
                   include.var.pie=include.var.pie,
                   include.bar.plots=include.bar.plots,
                   include.density=include.density,
+                  include.rank=FALSE,
                   back.allele=back.allele,
                   ...)
 }
