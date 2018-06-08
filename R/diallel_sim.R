@@ -1,8 +1,8 @@
 #' @export simulate.diallel
 simulate.diallel <- function(M=8,
                              mu=10, inbred.mu=-5, female.mu=-2,
-                             add.size, inbred.size, epistatic.size, maternal.size=0, 
-                             add.effect=NULL, inbred.effect=NULL, epistatic.effect=NULL, maternal.effect=NULL,
+                             add.size, inbred.size, epi.sym.size, epi.asym.size, maternal.size=0, 
+                             add.effect=NULL, inbred.effect=NULL, epi.sym.effect=NULL, epi.asym.effect=NULL, maternal.effect=NULL,
                              n.each=5, num.sim=1, strains=LETTERS[1:M]){
   
   non.sample.var <- function(x) {
@@ -21,11 +21,16 @@ simulate.diallel <- function(M=8,
   inbred.effect <- (inbred.effect - mean(inbred.effect))/sqrt(non.sample.var(inbred.effect))
   inbred.effect <- inbred.effect*sqrt(inbred.size)
   names(inbred.effect) <- strains
-  # epistatic
-  if (is.null(epistatic.effect)) { epistatic.effect <- rnorm(n=choose(M, 2)) }
-  epistatic.effect <- (epistatic.effect - mean(epistatic.effect))/sqrt(non.sample.var(epistatic.effect))
-  epistatic.effect <- epistatic.effect*sqrt(epistatic.size)
-  names(epistatic.effect) <- make.pairs(strains)
+  # symmetric epistatic
+  if (is.null(epi.sym.effect)) { epi.sym.effect <- rnorm(n=choose(M, 2)) }
+  epi.sym.effect <- (epi.sym.effect - mean(epi.sym.effect))/sqrt(non.sample.var(epi.sym.effect))
+  epi.sym.effect <- epi.sym.effect*sqrt(epi.sym.size)
+  names(epi.sym.effect) <- make.pairs(strains)
+  # asymmetric epistatic
+  if (is.null(epi.asym.effect)) { epi.asym.effect <- rnorm(n=choose(M, 2)) }
+  epi.asym.effect <- (epi.asym.effect - mean(epi.asym.effect))/sqrt(non.sample.var(epi.asym.effect))
+  epi.asym.effect <- epi.asym.effect*sqrt(epi.asym.size)
+  names(epi.asym.effect) <- make.pairs(strains)
   # maternal
   if (is.null(maternal.effect)) { maternal.effect <- rnorm(n=M) }
   maternal.effect <- (maternal.effect - mean(maternal.effect))/sqrt(non.sample.var(maternal.effect))
@@ -55,14 +60,18 @@ simulate.diallel <- function(M=8,
   epi.init.matrix <- rbind(inbred.portion.epi.init.matrix, epi.init.matrix)
   
   ###### Epistatic
-  epistatic.matrix <- epi.init.matrix[apply(all.individuals, 1, function(x) paste(sort(x), collapse=".")),]; colnames(epistatic.matrix) <- make.pairs(strains)
+  epi.sym.matrix <- epi.init.matrix[apply(all.individuals, 1, function(x) paste(sort(x), collapse=".")),]; colnames(epi.sym.matrix) <- make.pairs(strains)
+
+  asym.flip <- !apply(all.individuals, 1, function(x) paste(x, collapse=".")) == apply(all.individuals, 1, function(x) paste(sort(x), collapse="."))
+  epi.asym.matrix <- epi.sym.matrix
+  epi.asym.matrix[asym.flip,] <- -1*epi.sym.matrix[asym.flip,]
   
   ###### Sex
   is.female <- rbinom(n=n.each*M^2, size=1, prob=0.5)
   
   ###### Simulation
-  noise.var <- 1 - add.size - inbred.size - epistatic.size - maternal.size
-  y.pred <- mu + is.female*female.mu + add.matrix %*% add.effect + inbred.fixed.effect*inbred.mu + inbred.matrix %*% inbred.effect + maternal.matrix %*% maternal.effect + epistatic.matrix %*% epistatic.effect
+  noise.var <- 1 - add.size - inbred.size - epi.sym.size - epi.asym.size - maternal.size
+  y.pred <- mu + is.female*female.mu + add.matrix %*% add.effect + inbred.fixed.effect*inbred.mu + inbred.matrix %*% inbred.effect + maternal.matrix %*% maternal.effect + epi.sym.matrix %*% epi.sym.effect + epi.asym.matrix %*% epi.asym.effect
   
   sample.scaled.resid <- function(n, noise.var) {
     resid <- rnorm(n)
@@ -80,20 +89,23 @@ simulate.diallel <- function(M=8,
                                          add.effect, 
                                          inbred.effect, 
                                          maternal.effect, 
-                                         epistatic.effect,
-                                         1 - add.size - inbred.size - maternal.size - epistatic.size,
-                                         add.size, inbred.size, maternal.size, epistatic.size), nrow=1))
+                                         epi.sym.effect,
+                                         epi.asym.effect,
+                                         1 - add.size - inbred.size - maternal.size - epi.sym.size - epi.asym.size,
+                                         add.size, inbred.size, maternal.size, epi.sym.size, epi.asym.size), nrow=1))
   colnames(didact.input) <- c("mu", "female", "inbred penalty", 
-                              paste(names(add.effect), "add"), 
-                              paste(names(inbred.effect), "inbred"),
-                              paste(names(maternal.effect), "mat"),
-                              paste(unlist(lapply(strsplit(x=names(epistatic.effect), split=".", fixed=TRUE), function(x) paste(rev(x), collapse=" "))), "epi"),
-                              "sigma2", "tau2 add", "tau2 inbred", "tau2 mat", "tau2 epi")
+                              paste("add",names(add.effect), sep=":"), 
+                              paste("inbred", names(inbred.effect), sep=":"),
+                              paste("mat", names(maternal.effect), sep=":"),
+                              paste("epi_sym", unlist(lapply(strsplit(x=names(epi.sym.effect), split=".", fixed=TRUE), function(x) paste(rev(x), collapse=";"))), sep=":"),
+                              paste("epi_asym", unlist(lapply(strsplit(x=names(epi.asym.effect), split=".", fixed=TRUE), function(x) paste(rev(x), collapse=";"))), sep=":"),
+                              "sigma2", "tau_add", "tau_inbred", "tau_mat", "tau_epi_sym", 'tau_epi_asym')
   results <- list(diallel.data=diallel.data,
                   effects=list(add=add.effect,
                                inbred=inbred.effect,
                                maternal=maternal.effect,
-                               epistatic=epistatic.effect,
+                               epi_sym=epi.sym.effect,
+                               epi_asym=epi.asym.effect,
                                mu=mu,
                                inbred.mu=inbred.mu,
                                female.mu=female.mu),
@@ -125,3 +137,4 @@ make.all.pairs.matrix <- function(strains){
   }
   return(pair.matrix)
 }
+
