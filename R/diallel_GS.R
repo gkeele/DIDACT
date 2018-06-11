@@ -43,7 +43,8 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
                           sigma.2.starter=5, tau_add.starter=2, tau_inbred.starter=2, tau_mat.starter=2, tau_epi_sym.starter=2, tau_epi_asym.starter=2,
                           strains.reorder=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
                           strains.rename=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
-                          use.constraint=TRUE) {
+                          use.constraint=TRUE,
+                          use.progress.bar=TRUE) {
   if (!is.null(strains.reorder)){
     mother.str <- factor(mother.str, levels=strains.reorder)
     father.str <- factor(father.str, levels=strains.reorder)
@@ -132,9 +133,11 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
   # Overall design matrix
   X.all <- cbind(X, add.part, inbred.part, mat.part, epi_sym.part, epi_asym.part)
   if (burn.in > 0) {
-    # Progress bar
     cat("Burn-in:\n")
-    burnin.pb <- txtProgressBar(min=0, max=burn.in, style=3)
+    # Progress bar
+    if (use.progress.bar) {
+      burnin.pb <- txtProgressBar(min=0, max=burn.in, style=3)
+    }
   }
   # For multiple chains
   if (multi.chain > 1) {
@@ -224,7 +227,9 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
       if (i > burn.in) {
         if (i == burn.in + 1) { 
           cat("Saved MCMC sampling:\n")
-          pb <- txtProgressBar(min=0, max=n.iter*multi.chain, style=3)
+          if (use.progress.bar) {
+            pb <- txtProgressBar(min=0, max=n.iter*multi.chain, style=3)
+          }
         }
         if ((i-1-burn.in) %% thin == 0) {
           if (use.constraint) {
@@ -240,8 +245,10 @@ diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str
             p.mat[counter,] <- c(beta.vec, sigma.2, tau_add, tau_inbred, tau_mat, tau_epi_sym, tau_epi_asym)
           }
           counter <- counter + 1
-          # Progresses progress bar
-          setTxtProgressBar(pb, counter)
+          if(use.progress.bar) {
+            # Progresses progress bar
+            setTxtProgressBar(pb, counter)
+          }
         }
       }
     }
