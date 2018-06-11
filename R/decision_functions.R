@@ -510,19 +510,24 @@ var.matcher.general <- function(par.vec,
 par.cruncher.general <- function(par.mat, 
                                  n, 
                                  qtl.num=1, 
-                                 strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
+                                 strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
+                                 use.progress.bar=TRUE){
   power.list <- list()
   phenotype.list <- list()
   var.list <- list()
-  pb <- txtProgressBar(min=0, max=nrow(par.mat), style=3)
+  if (use.progress.bar) {
+    pb <- txtProgressBar(min=0, max=nrow(par.mat), style=3)
+  }
   for (i in 1:nrow(par.mat)) {
     # Makes a list of cross powers - each element of list is a power matrix for a given set of parameters from diallel.GS
     power.list[[i]] <- power.matcher.general(par.vec=par.mat[i,], n=n, qtl.num=qtl.num, strains=strains)
     eff.var.list <- var.matcher.general(par.vec=par.mat[i,], qtl.num=qtl.num, strains=strains)
     phenotype.list[[i]] <- eff.var.list[[1]]
     var.list[[i]] <- eff.var.list[[2]]
-    # Makes a progress bar
-    setTxtProgressBar(pb, i)
+    if (use.progress.bar) {
+      # Makes a progress bar
+      setTxtProgressBar(pb, i)
+    }
   }
   final <- list(power.list, phenotype.list, var.list)
   return(final)
@@ -595,7 +600,8 @@ picker <- function(mat, row, col){
 evaluate.experiments <- function(gibbs.object, 
                                  n, 
                                  qtl.num=1, 
-                                 strains.relabel=NULL){
+                                 strains.relabel=NULL,
+                                 use.progress.bar=TRUE){
   # Using previous functions
   par.mat <- gibbs.object$mcmc
   strains <- gibbs.object$strains
@@ -608,7 +614,8 @@ evaluate.experiments <- function(gibbs.object,
   par.bundle <- par.cruncher.general(par.mat=par.mat, 
                                      n=n, 
                                      qtl.num=qtl.num, 
-                                     strains=strains)
+                                     strains=strains,
+                                     use.progress.bar=use.progress.bar)
   var.list <- par.bundle[[3]]
   pheno.list <- par.bundle[[2]]
   power.list <- par.bundle[[1]]
