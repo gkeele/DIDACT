@@ -17,34 +17,83 @@ make.M <- function(X) {
 }
 
 # Update functions
-update.beta <- function(X, y, res.var, prior.var) {
+update.beta <- function(X, 
+                        y, 
+                        res.var, 
+                        prior.var) {
   post.var <- chol2inv(chol(t(X) %*% X + res.var*chol2inv(chol(prior.var))))*res.var
   post.mean <- (1/res.var)*post.var %*% t(X) %*% y
   beta.vec <- c(mnormt::rmnorm(1, mean=post.mean, varcov=post.var))
   return(beta.vec)
 }
-update.sigma.2 <- function(X, y, prior.alpha, prior.beta, par.vec) {
+update.sigma.2 <- function(X, 
+                           y, 
+                           prior.alpha, 
+                           prior.beta, 
+                           par.vec) {
   post.alpha <- (nrow(X) + prior.alpha)/2
   post.beta <- (t(y - X %*% par.vec) %*% (y - X %*% par.vec) + prior.beta*prior.alpha)/2
   sigma.2 <- 1/rgamma(1, shape=post.alpha, rate=post.beta)
   return(sigma.2)
 }
-update.tau <- function(K, prior.alpha, prior.beta, par.vec) {
+update.tau <- function(K, 
+                       prior.alpha, 
+                       prior.beta, 
+                       par.vec) {
   post.alpha <- (ncol(K) + prior.alpha)/2
   post.beta <- (t(par.vec) %*% chol2inv(chol(K)) %*% par.vec + prior.beta)/2
   tau <- 1/rgamma(1, shape=post.alpha, rate=post.beta)
   return(tau)
 }
 
-# Need to run this before evaluating utility
-# Gibbs sampler for diallel data
-#' @export
-diallel.gibbs <- function(phenotype, sex, is.female=TRUE, mother.str, father.str, n.iter, burn.in, multi.chain=1, thin=1,
-                          sigma.2.starter=5, tau_add.starter=2, tau_inbred.starter=2, tau_mat.starter=2, tau_epi_sym.starter=2, tau_epi_asym.starter=2,
-                          strains.reorder=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
-                          strains.rename=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
-                          use.constraint=TRUE,
-                          use.progress.bar=TRUE) {
+#' Gibbs sampler that specifies a form of the BayesDiallel model. 
+#'
+#' This function runs the BayesDiallel Gibbs Sampler for diallel cross data.
+#'
+#' @param phenotype Vector of the phenotypes. Expects a quantitative phenotype.
+#' @param sex Binary vector for females and males. By default, expects females to be coded as 1 and males as 0.
+#' @param is.female DEFAULT: TRUE. If TRUE, then sex expects female=1 and male=0. If FALSE, then female=0 and male=1.
+#' @param mother.str Vector of strain identities of mother/dam.
+#' @param father.str Vector of strain identities of father/sire.
+#' @param n.iter DEFAULT: 1000. The number of samples to be collected.
+#' @param burn.in DEFAULT: 10000. The number of samples run as a burn-in, which are not stored.
+#' @param multi.chain DEFAULT: 1. The number of MCMC chains to run. 
+#' @param thin DEFAULT: 1. If 1, no thinning is used. If 2, then every other sample is stored. If 3, then every
+#' third observation is stored. And so on.
+#' @param sigma2.starter DEFAULT: 5. Starting value for the residual error variance parameter in the Gibbs Sampler.
+#' @param tau_add.starter DEFAULT: 2. Starting value for the variance parameter of the additive effects in the Gibbs Sampler.
+#' @param tau_inbred.starter DEFAULT: 2. Starting value for the variance parameter of the inbred effects in the Gibbs Sampler.
+#' @param tau_mat.starter DEFAULT: 2. Starting value for the variance parameter of the maternal effects in the Gibbs Sampler.
+#' @param tau_epi_sym.starter DEFAULT: 2. Starting value for the variance parameter of the symmetric epistatic effects in the Gibbs Sampler.
+#' @param tau_epi_asym.starter DEFAULT: 2. Starting value for the variance parameter of the asymmetric epistatic effects in the Gibbs Sampler.
+#' @param strains.reorder DEFAULT: c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"). Orders the strains based on the standard
+#' ordering of Collaborative Cross founders
+#' @param strains.rename DEFAULT: c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"). Renames the strains. By default, expects the
+#' founders of the Collaborative Cross.
+#' @param use.constraint DEFAULT: TRUE. Use a rotation matrix to reduce the dimension of strain matrices because the system is linearly dependent.
+#' Can result in narrower posterior intervals.
+#' @param use.progress.bar DEFAULT: TRUE. A progress bar shows how sampling is progressing.
+#' @export diallel.gibbs
+#' @examples diallel.gibbs()
+diallel.gibbs <- function(phenotype, 
+                          sex, 
+                          is.female = TRUE, 
+                          mother.str, 
+                          father.str, 
+                          n.iter = 1000, 
+                          burn.in = 10000, 
+                          multi.chain = 1, 
+                          thin = 1,
+                          sigma.2.starter = 5, 
+                          tau_add.starter = 2, 
+                          tau_inbred.starter = 2, 
+                          tau_mat.starter = 2, 
+                          tau_epi_sym.starter = 2, 
+                          tau_epi_asym.starter = 2,
+                          strains.reorder = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
+                          strains.rename = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
+                          use.constraint = TRUE,
+                          use.progress.bar = TRUE) {
   if (!is.null(strains.reorder)){
     mother.str <- factor(mother.str, levels=strains.reorder)
     father.str <- factor(father.str, levels=strains.reorder)

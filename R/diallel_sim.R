@@ -1,9 +1,41 @@
+#' Simulate diallel data from the BayesDiallel model
+#'
+#' This function generates data from the BayesDiallel model. It does not currently allow for sex
+#' interactions with strain-level effects, as is possible in the proper BayesDiallel package.
+#'
+#' @param M DEFAULT: 8. The number of strains in the diallel cross. Default of 8 is the number of founders in the Collaborative Cross.
+#' @param mu DEFAULT: 10. The grand mean of the phenotype.
+#' @param inbred.mu DEFAULT: -5. The overall inbred effect.
+#' @param female.mu DEFAULT: -2. The overall female effect (male is reference).
+#' @param add.size The proportion of the variance explained by the additive effects.
+#' @param inbred.size The proportion of the variance explained by the inbred effects.
+#' @param epi.sym.size The proportion of the variance explained by the symmetric epistatic effects.
+#' @param epi.asym.size The proportion of the variance explained by the asymmetric epistatic effects.
+#' @param maternal.size The proportion of the variance explained by the maternal effects.
+#' @param n.each DEFAULT: 5. The number of individuals simulated per cell of the diallel. 
+#' Total sample size of diallel cross will be n.each * 64
+#' @param num.sim DEFAULT: 1. The number of diallel cross simulations to perform.
+#' @param strains DEFAULT: c("A", "B", "C", "D", "E", "F", "G", "H"). The strain names used. Defaults to 
+#' simple letter representation.
 #' @export simulate.diallel
-simulate.diallel <- function(M=8,
-                             mu=10, inbred.mu=-5, female.mu=-2,
-                             add.size, inbred.size, epi.sym.size, epi.asym.size, maternal.size=0, 
-                             add.effect=NULL, inbred.effect=NULL, epi.sym.effect=NULL, epi.asym.effect=NULL, maternal.effect=NULL,
-                             n.each=5, num.sim=1, strains=LETTERS[1:M]){
+#' @examples simulate.diallel()
+simulate.diallel <- function(M = 8,
+                             mu = 10, 
+                             inbred.mu = -5, 
+                             female.mu = -2,
+                             add.size, 
+                             inbred.size, 
+                             epi.sym.size, 
+                             epi.asym.size, 
+                             maternal.size = 0, 
+                             add.effect = NULL, 
+                             inbred.effect = NULL, 
+                             epi.sym.effect = NULL, 
+                             epi.asym.effect = NULL, 
+                             maternal.effect = NULL,
+                             n.each = 5, 
+                             num.sim = 1, 
+                             strains = LETTERS[1:M]){
   
   non.sample.var <- function(x) {
     var.x <- var(x)*((length(x) - 1)/length(x))
@@ -12,7 +44,7 @@ simulate.diallel <- function(M=8,
   
   ## Simulate diallel effects
   # add
-  if (is.null(add.effect)) { add.effect <- rnorm(n=M) }
+  if (is.null(add.effect)) { add.effect <- rnorm(n = M) }
   add.effect <- (add.effect - mean(add.effect))/sqrt(non.sample.var(add.effect))
   add.effect <- 0.5*add.effect*sqrt(add.size)
   names(add.effect) <- strains
@@ -67,23 +99,24 @@ simulate.diallel <- function(M=8,
   epi.asym.matrix[asym.flip,] <- -1*epi.sym.matrix[asym.flip,]
   
   ###### Sex
-  is.female <- rbinom(n=n.each*M^2, size=1, prob=0.5)
+  is.female <- rbinom(n = n.each*M^2, size = 1, prob = 0.5)
   
   ###### Simulation
   noise.var <- 1 - add.size - inbred.size - epi.sym.size - epi.asym.size - maternal.size
   y.pred <- mu + is.female*female.mu + add.matrix %*% add.effect + inbred.fixed.effect*inbred.mu + inbred.matrix %*% inbred.effect + maternal.matrix %*% maternal.effect + epi.sym.matrix %*% epi.sym.effect + epi.asym.matrix %*% epi.asym.effect
   
-  sample.scaled.resid <- function(n, noise.var) {
+  sample.scaled.resid <- function(n, 
+                                  noise.var) {
     resid <- rnorm(n)
     resid <- (resid - mean(resid))/sqrt(non.sample.var(resid))
     resid <- resid*sqrt(noise.var)
     return(resid)
   }
   
-  y <- sapply(1:num.sim, function(x) y.pred + sample.scaled.resid(n=length(y.pred), noise.var=noise.var))
+  y <- sapply(1:num.sim, function(x) y.pred + sample.scaled.resid(n = length(y.pred), noise.var = noise.var))
   colnames(y) <- paste0("y.sim.", 1:num.sim)
   
-  diallel.data <- data.frame(y, is.female, dam.id=all.individuals[,"dam.id"], sire.id=all.individuals[,"sire.id"])
+  diallel.data <- data.frame(y, is.female, dam.id = all.individuals[,"dam.id"], sire.id = all.individuals[,"sire.id"])
   
   didact.input <- coda::as.mcmc(matrix(c(mu, female.mu, inbred.mu, 
                                          add.effect, 
@@ -100,26 +133,27 @@ simulate.diallel <- function(M=8,
                               paste("epi_sym", unlist(lapply(strsplit(x=names(epi.sym.effect), split=".", fixed=TRUE), function(x) paste(rev(x), collapse=";"))), sep=":"),
                               paste("epi_asym", unlist(lapply(strsplit(x=names(epi.asym.effect), split=".", fixed=TRUE), function(x) paste(rev(x), collapse=";"))), sep=":"),
                               "sigma2", "tau_add", "tau_inbred", "tau_mat", "tau_epi_sym", 'tau_epi_asym')
-  results <- list(diallel.data=diallel.data,
-                  effects=list(add=add.effect,
-                               inbred=inbred.effect,
-                               maternal=maternal.effect,
-                               epi_sym=epi.sym.effect,
-                               epi_asym=epi.asym.effect,
-                               mu=mu,
-                               inbred.mu=inbred.mu,
-                               female.mu=female.mu),
-                  didact.input=list(mcmc=didact.input,
-                                    strains=names(add.effect)))
+  results <- list(diallel.data = diallel.data,
+                  effects = list(add = add.effect,
+                               inbred = inbred.effect,
+                               maternal = maternal.effect,
+                               epi_sym = epi.sym.effect,
+                               epi_asym = epi.asym.effect,
+                               mu = mu,
+                               inbred.mu = inbred.mu,
+                               female.mu = female.mu),
+                  didact.input = list(mcmc = didact.input,
+                                    strains = names(add.effect)))
   return(results)
 }
 
-make.pairs <- function(strains, this.sep="."){
+make.pairs <- function(strains, 
+                       this.sep = "."){
   pairs <- rep(NA, choose(length(strains), 2))
   counter <- 1
-  for(i in 1:(length(strains) - 1)){
-    for(j in (i+1):length(strains)){
-      pairs[counter] <- paste(strains[i], strains[j], sep=this.sep)
+  for (i in 1:(length(strains) - 1)) {
+    for (j in (i+1):length(strains)) {
+      pairs[counter] <- paste(strains[i], strains[j], sep = this.sep)
       counter <- counter + 1
     }
   }
@@ -127,7 +161,7 @@ make.pairs <- function(strains, this.sep="."){
 }
 
 make.all.pairs.matrix <- function(strains){
-  pair.matrix <- matrix(NA, nrow=length(strains)^2, ncol=2)
+  pair.matrix <- matrix(NA, nrow = length(strains)^2, ncol=2)
   current.row <- 1
   for(i in 1:(length(strains))){
     for(j in 1:(length(strains))){

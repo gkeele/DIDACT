@@ -2,8 +2,8 @@
 calc.f2.effects <- function(line.m, 
                             line.p, 
                             par.vec, 
-                            qtl.num=1,
-                            strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
+                            qtl.num = 1,
+                            strain.order = c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
   m.a.effect <- par.vec[paste("add", line.m, sep=":")]
   p.a.effect <- par.vec[paste("add", line.p, sep=":")]
   i.effect <- par.vec["inbred penalty"]
@@ -33,8 +33,8 @@ calc.f2.effects <- function(line.m,
 calc.bc.effects <- function(re.cross.line, 
                             other.line, 
                             par.vec, 
-                            qtl.num=1,
-                            strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
+                            qtl.num = 1,
+                            strain.order = c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
   re.cross.a.effect <- par.vec[paste("add", re.cross.line, sep=":")]
   other.line.a.effect <- par.vec[paste("add", other.line, sep=":")]
   i.effect <- par.vec["inbred penalty"]
@@ -57,12 +57,13 @@ calc.bc.effects <- function(re.cross.line,
   effects <- add.dom/qtl.num
   return(effects)
 }
+
 calc.rbc.effects <- function(re.cross.line, 
                              other.line, 
                              mat.line, 
                              par.vec, 
-                             qtl.num=1,
-                             strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
+                             qtl.num = 1,
+                             strain.order = c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
   # Determining paternal line
   if (mat.line == re.cross.line) {
     pat.line <- other.line
@@ -98,8 +99,8 @@ calc.rbc.effects <- function(re.cross.line,
 calc.phenotypes.f2 <- function(line.m, 
                                line.p, 
                                par.vec, 
-                               qtl.num=1,
-                               strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
+                               qtl.num = 1,
+                               strain.order = c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
   m.a.effect <- par.vec[paste("add", line.m, sep=":")]
   p.a.effect <- par.vec[paste("add", line.p, sep=":")]
   m.i.effect <- par.vec[paste("inbred", line.m, sep=":")]
@@ -123,12 +124,13 @@ calc.phenotypes.f2 <- function(line.m,
   colnames(phenos) <- c("f2-hom1", "f2-het", "f2-hom2")
   return(phenos)
 }
+
 calc.phenotypes.bc <- function(re.cross.line, 
                                other.line, 
                                par.vec, 
-                               qtl.num=1, 
-                               cross.type="bc1",
-                               strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
+                               qtl.num = 1, 
+                               cross.type = "bc1",
+                               strain.order = c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
   re.cross.a.effect <- par.vec[paste("add", re.cross.line, sep=":")]
   other.a.effect <- par.vec[paste("add", other.line, sep=":")]
   re.cross.i.effect <- par.vec[paste("inbred", re.cross.line, sep=":")]
@@ -160,9 +162,9 @@ calc.phenotypes.rbc <- function(re.cross.line,
                                 other.line, 
                                 mat.line, 
                                 par.vec, 
-                                qtl.num=1, 
-                                cross.type="rbc1_1",
-                                strain.order=c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
+                                qtl.num = 1, 
+                                cross.type = "rbc1_1",
+                                strain.order = c("WSB", "PWK", "CAST", "NZO", "NOD", "129", "B6", "AJ")){
   # Determining paternal line
   if (mat.line == re.cross.line) {
     pat.line <- other.line
@@ -210,10 +212,10 @@ power.cruncher.general <- function(line.m,
                                    cross.type, 
                                    par.vec, 
                                    n, 
-                                   re.cross=NULL, 
-                                   mat.line=NULL, 
-                                   qtl.num=1,
-                                   strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
+                                   re.cross = NULL, 
+                                   mat.line = NULL, 
+                                   qtl.num = 1,
+                                   strains = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
   # Power calculation
   if(cross.type == "f2"){
     f2.effects <- calc.f2.effects(line.m=line.m, line.p=line.p, par.vec=par.vec, qtl.num=qtl.num, strain.order=rev(strains))
@@ -252,8 +254,8 @@ power.cruncher.general <- function(line.m,
 
 power.matcher.general <- function(par.vec, 
                                   n, 
-                                  qtl.num=1, 
-                                  strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
+                                  qtl.num = 1, 
+                                  strains = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
   # Initialize data objects
   cross.names <- NULL
   powers <- NULL
@@ -334,15 +336,15 @@ power.matcher.general <- function(par.vec,
   return(strain.matrix)
 }
 
-######################## Calculate variance explained
+## Calculate variance explained
 calc.var.exp.general <- function(line.m, 
                                  line.p, 
                                  cross.type, 
                                  par.vec, 
-                                 re.cross=NULL, 
-                                 mat.line=NULL, 
-                                 qtl.num=1,
-                                 strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
+                                 re.cross = NULL, 
+                                 mat.line = NULL, 
+                                 qtl.num = 1,
+                                 strains = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
   if (cross.type == "f2") {
     effects <- calc.f2.effects(line.m=line.m, 
                                line.p=line.p, 
@@ -407,22 +409,23 @@ calc.var.exp.general <- function(line.m,
                                 strain.order=rev(strains))
     qtl.var <- (1/4)*(effects)^2
     
-    phenotypes <- calc.phenotypes.rbc(re.cross.line=re.cross, 
-                                      other.line=other.line, 
-                                      mat.line=mat.line, 
-                                      par.vec=par.vec, 
-                                      qtl.num=qtl.num, 
-                                      cross.type=type,
-                                      strain.order=rev(strains))
+    phenotypes <- calc.phenotypes.rbc(re.cross.line = re.cross, 
+                                      other.line = other.line, 
+                                      mat.line = mat.line, 
+                                      par.vec = par.vec, 
+                                      qtl.num = qtl.num, 
+                                      cross.type = type,
+                                      strain.order = rev(strains))
   }
   perc.var <- 100*qtl.var*qtl.num/(qtl.var*qtl.num + par.vec["sigma2"])
   return(list(phenotypes, as.numeric(perc.var)))
 }
 
-######################## Calculates variance explained by QTL for a given draw from the Gibbs sampler for all possible crosses
+## Calculates variance explained by QTL for a given draw 
+## from the Gibbs sampler for all possible crosses
 var.matcher.general <- function(par.vec, 
-                                qtl.num=1, 
-                                strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
+                                qtl.num = 1, 
+                                strains = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB")){
   # 8 founder lines of CC are default
   # Initialize data objects
   cross.names <- NULL
@@ -433,60 +436,60 @@ var.matcher.general <- function(par.vec,
   for (i in 1:(length(strains)-1)) {
     for (j in mover:length(strains)) {
       # Cross types
-      bc.cross1 <- calc.var.exp.general(line.m=strains[i], 
-                                        line.p=strains[j], 
-                                        cross.type="bc", 
-                                        par.vec=par.vec, 
-                                        re.cross=strains[i], 
-                                        qtl.num=qtl.num, 
-                                        strains=strains)
-      rbc.cross1_1 <- calc.var.exp.general(line.m=strains[i], 
-                                           line.p=strains[j], 
-                                           cross.type="rbc", 
-                                           par.vec=par.vec, 
-                                           re.cross=strains[i], 
-                                           mat.line=strains[i], 
-                                           qtl.num=qtl.num, 
-                                           strains=strains)
-      rbc.cross1_2 <- calc.var.exp.general(line.m=strains[i], 
-                                           line.p=strains[j], 
-                                           cross.type="rbc", 
-                                           par.vec=par.vec, 
-                                           re.cross=strains[i], 
-                                           mat.line=strains[j], 
-                                           qtl.num=qtl.num, 
-                                           strains=strains)
+      bc.cross1 <- calc.var.exp.general(line.m = strains[i], 
+                                        line.p = strains[j], 
+                                        cross.type = "bc", 
+                                        par.vec = par.vec, 
+                                        re.cross = strains[i], 
+                                        qtl.num = qtl.num, 
+                                        strains = strains)
+      rbc.cross1_1 <- calc.var.exp.general(line.m = strains[i], 
+                                           line.p = strains[j], 
+                                           cross.type = "rbc", 
+                                           par.vec = par.vec, 
+                                           re.cross = strains[i], 
+                                           mat.line = strains[i], 
+                                           qtl.num = qtl.num, 
+                                           strains = strains)
+      rbc.cross1_2 <- calc.var.exp.general(line.m = strains[i], 
+                                           line.p = strains[j], 
+                                           cross.type = "rbc", 
+                                           par.vec = par.vec, 
+                                           re.cross = strains[i], 
+                                           mat.line = strains[j], 
+                                           qtl.num = qtl.num, 
+                                           strains = strains)
 
-      bc.cross2 <- calc.var.exp.general(line.m=strains[i], 
-                                        line.p=strains[j], 
-                                        cross.type="bc", 
-                                        par.vec=par.vec, 
-                                        re.cross=strains[j], 
-                                        qtl.num=qtl.num, 
-                                        strains=strains)
-      rbc.cross2_1 <- calc.var.exp.general(line.m=strains[i], 
-                                           line.p=strains[j], 
-                                           cross.type="rbc", 
-                                           par.vec=par.vec, 
-                                           re.cross=strains[j], 
-                                           mat.line=strains[i], 
-                                           qtl.num=qtl.num, 
-                                           strains=strains)
-      rbc.cross2_2 <- calc.var.exp.general(line.m=strains[i], 
-                                           line.p=strains[j], 
-                                           cross.type="rbc", 
-                                           par.vec=par.vec, 
-                                           re.cross=strains[j], 
-                                           mat.line=strains[j], 
-                                           qtl.num=qtl.num, 
-                                           strains=strains)
+      bc.cross2 <- calc.var.exp.general(line.m = strains[i], 
+                                        line.p = strains[j], 
+                                        cross.type = "bc", 
+                                        par.vec = par.vec, 
+                                        re.cross = strains[j], 
+                                        qtl.num = qtl.num, 
+                                        strains = strains)
+      rbc.cross2_1 <- calc.var.exp.general(line.m = strains[i], 
+                                           line.p = strains[j], 
+                                           cross.type = "rbc", 
+                                           par.vec = par.vec, 
+                                           re.cross = strains[j], 
+                                           mat.line = strains[i], 
+                                           qtl.num = qtl.num, 
+                                           strains = strains)
+      rbc.cross2_2 <- calc.var.exp.general(line.m = strains[i], 
+                                           line.p = strains[j], 
+                                           cross.type = "rbc", 
+                                           par.vec = par.vec, 
+                                           re.cross = strains[j], 
+                                           mat.line = strains[j], 
+                                           qtl.num = qtl.num, 
+                                           strains = strains)
       
-      f2.cross <- calc.var.exp.general(line.m=strains[i], 
-                                       line.p=strains[j], 
-                                       cross.type="f2", 
-                                       par.vec=par.vec, 
-                                       qtl.num=qtl.num, 
-                                       strains=strains)
+      f2.cross <- calc.var.exp.general(line.m = strains[i], 
+                                       line.p = strains[j], 
+                                       cross.type = "f2", 
+                                       par.vec = par.vec, 
+                                       qtl.num = qtl.num, 
+                                       strains = strains)
       
       # Processing output
       cross.names <- paste(strains[i], "x", strains[j], sep="")
@@ -506,12 +509,13 @@ var.matcher.general <- function(par.vec,
   return(list(phenotype.matrix, var.matrix))
 }
 
-######################## Runs power.matcher and var.matcher over the parameter space sampled from diallel.GS - applies power.matcher over parameter draws from diallel.GS
+## Runs power.matcher and var.matcher over the parameter space sampled from diallel.GS
+## applies power.matcher over parameter draws from diallel.GS
 par.cruncher.general <- function(par.mat, 
                                  n, 
-                                 qtl.num=1, 
-                                 strains=c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
-                                 use.progress.bar=TRUE){
+                                 qtl.num = 1, 
+                                 strains = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
+                                 use.progress.bar = TRUE){
   power.list <- list()
   phenotype.list <- list()
   var.list <- list()
@@ -520,8 +524,13 @@ par.cruncher.general <- function(par.mat,
   }
   for (i in 1:nrow(par.mat)) {
     # Makes a list of cross powers - each element of list is a power matrix for a given set of parameters from diallel.GS
-    power.list[[i]] <- power.matcher.general(par.vec=par.mat[i,], n=n, qtl.num=qtl.num, strains=strains)
-    eff.var.list <- var.matcher.general(par.vec=par.mat[i,], qtl.num=qtl.num, strains=strains)
+    power.list[[i]] <- power.matcher.general(par.vec = par.mat[i,], 
+                                             n = n, 
+                                             qtl.num = qtl.num, 
+                                             strains = strains)
+    eff.var.list <- var.matcher.general(par.vec = par.mat[i,], 
+                                        qtl.num = qtl.num, 
+                                        strains = strains)
     phenotype.list[[i]] <- eff.var.list[[1]]
     var.list[[i]] <- eff.var.list[[2]]
     if (use.progress.bar) {
@@ -533,10 +542,12 @@ par.cruncher.general <- function(par.mat,
   return(final)
 }
 
-######################## Moving from power (probabilities) to consequences
-# Function to calculate the probability of the possible outcomes (consequences) of a QTL mapping experiment
-utility.calculator.general <- function(power.mat, col, qtl.num=1){
-  c.matrix <- matrix(nrow=nrow(power.mat), ncol=qtl.num+1)
+## Moving from power (probabilities) to consequences
+## Function to calculate the probability of the possible outcomes (consequences) of a QTL mapping experiment
+utility.calculator.general <- function(power.mat, 
+                                       col, 
+                                       qtl.num = 1){
+  c.matrix <- matrix(nrow = nrow(power.mat), ncol = qtl.num + 1)
   total <- qtl.num
   for (i in 0:total) {
     p <- log(choose(total, i)) + i*log(power.mat[,col] + 5e-324) + (total-i)*log(1 - power.mat[,col] + 5e-324)
@@ -547,8 +558,9 @@ utility.calculator.general <- function(power.mat, col, qtl.num=1){
   return(c.matrix)
 }
 
-# Runs all consequences for all 3 types of cross for each combination of lines
-utility.runner.general <- function(power.mat, qtl.num=1){
+## Runs all consequences for all 3 types of cross for each combination of lines
+utility.runner.general <- function(power.mat, 
+                                   qtl.num = 1){
   # Consequence probabilities
   c_bc1 <- utility.calculator.general(power.mat, 1, qtl.num)  
   c_rbc1_1 <- utility.calculator.general(power.mat, 2, qtl.num)
@@ -563,8 +575,8 @@ utility.runner.general <- function(power.mat, qtl.num=1){
   return(c.list)
 }
 
-######################## Calculating expected utility given a parameter set
-# Function calculates the expected utility (counts of QTL mapped: 2-0) for a given cross
+## Calculating expected utility given a parameter set
+## Function calculates the expected utility (counts of QTL mapped: 2-0) for a given cross
 eu.calculator <- function(c.mat){
   eu.vec <- 0
   for (i in 1:ncol(c.mat)) {
@@ -573,7 +585,7 @@ eu.calculator <- function(c.mat){
   return(eu.vec)
 }
 
-# Applies eu.calculator over all crosses for a given parameter set
+## Applies eu.calculator over all crosses for a given parameter set
 eu.grinder.general <- function(c.list){
   # Expected utilities
   bc1 <- eu.calculator(c.list[[1]])
@@ -590,18 +602,30 @@ eu.grinder.general <- function(c.list){
   return(eu.mat)
 }
 
-# Selects specific element from matrix
+## Selects specific element from matrix
 picker <- function(mat, row, col){
   return(mat[row,col])
 }
 
-##################### Collapse parameter set list to experiment list
-#' @export
+#' Propagate Gibbs Sampler (BayesDiallel model) to posterior utilities. 
+#'
+#' This function runs takes output from the BayesDiallel Gibbs Sampler and propagates these effects to the
+#' utility space.
+#' 
+#' @param gibbs.object Posterior samples from the BayesDiallel model fit with diallel.gibbs().
+#' @param n DEFAULT: 50. The number of individuals to be included in the proposed QTL mapping
+#' experiment.
+#' @param qtl.num DEFAULT: 1. The number of QTL underlying the estimated strain-level effects.
+#' If greater than 1, the effects are reduced accordingly.
+#' @param strains.relabel DEFAULT: NULL. Option to rename strains.
+#' @param use.progress.bar DEFAULT: TRUE. A progress bar shows how calculating the utilities is progressing.
+#' @export evaluate.experiments
+#' @examples evaluate.experiments()
 evaluate.experiments <- function(gibbs.object, 
-                                 n, 
-                                 qtl.num=1, 
-                                 strains.relabel=NULL,
-                                 use.progress.bar=TRUE){
+                                 n = 50, 
+                                 qtl.num = 1, 
+                                 strains.relabel = NULL,
+                                 use.progress.bar = TRUE){
   # Using previous functions
   par.mat <- gibbs.object$mcmc
   strains <- gibbs.object$strains
@@ -611,41 +635,40 @@ evaluate.experiments <- function(gibbs.object,
     strains <- strains.relabel
   }
   
-  par.bundle <- par.cruncher.general(par.mat=par.mat, 
-                                     n=n, 
-                                     qtl.num=qtl.num, 
-                                     strains=strains,
-                                     use.progress.bar=use.progress.bar)
+  par.bundle <- par.cruncher.general(par.mat = par.mat, 
+                                     n = n, 
+                                     qtl.num = qtl.num, 
+                                     strains = strains,
+                                     use.progress.bar = use.progress.bar)
   var.list <- par.bundle[[3]]
   pheno.list <- par.bundle[[2]]
   power.list <- par.bundle[[1]]
-  u.list <- lapply(power.list, function(x) utility.runner.general(x, qtl.num=qtl.num))
+  u.list <- lapply(power.list, function(x) utility.runner.general(x, qtl.num = qtl.num))
   power.list <- lapply(u.list, function(x) eu.grinder.general(x))
 
   # Initializing output lists
-  power.exp.list <- var.exp.list <- list(f2=list(),
-                                         bc1=list(),
-                                         bc2=list(),
-                                         rbc1_1=list(),
-                                         rbc1_2=list(),
-                                         rbc2_1=list(),
-                                         rbc2_2=list())
-  pheno.exp.list <- list(f2=list(hom1=list(),
-                                 hom2=list(),
-                                 het=list()),
-                         bc1=list(hom=list(),
-                                  het=list()),
-                         bc2=list(hom=list(),
-                                  het=list()),
-                         rbc1_1=list(hom=list(),
-                                     het=list()),
-                         rbc1_2=list(hom=list(),
-                                     het=list()),
-                         rbc2_1=list(hom=list(),
-                                     het=list()),
-                         rbc2_2=list(hom=list(),
-                                     het=list()))
-  
+  power.exp.list <- var.exp.list <- list(f2 = list(),
+                                         bc1 = list(),
+                                         bc2 = list(),
+                                         rbc1_1 = list(),
+                                         rbc1_2 = list(),
+                                         rbc2_1 = list(),
+                                         rbc2_2 = list())
+  pheno.exp.list <- list(f2=list(hom1 = list(),
+                                 hom2 = list(),
+                                 het = list()),
+                         bc1=list(hom = list(),
+                                  het = list()),
+                         bc2=list(hom = list(),
+                                  het = list()),
+                         rbc1_1=list(hom = list(),
+                                     het = list()),
+                         rbc1_2=list(hom = list(),
+                                     het = list()),
+                         rbc2_1=list(hom = list(),
+                                     het = list()),
+                         rbc2_2=list(hom = list(),
+                                     het = list()))
   
   exp.type <- colnames(power.list[[1]])
   cross.type <- rownames(power.list[[1]])
@@ -671,12 +694,12 @@ evaluate.experiments <- function(gibbs.object,
       pheno.exp.list[[this.exp]][[this.pheno]][[cross.type[j]]] <- pheno.experiment
     }
   }
-  results <- list(power=power.exp.list, 
-                  pheno=pheno.exp.list, 
-                  var=var.exp.list, 
-                  qtl.num=qtl.num, 
-                  n=n,
-                  strains=strains)
+  results <- list(power = power.exp.list, 
+                  pheno = pheno.exp.list, 
+                  var = var.exp.list, 
+                  qtl.num = qtl.num, 
+                  n = n,
+                  strains = strains)
   return(results)
 }
 
