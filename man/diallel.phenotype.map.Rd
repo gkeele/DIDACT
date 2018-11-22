@@ -9,7 +9,7 @@ diallel.phenotype.map(mother.str.var, father.str.var, phenotype, data,
   strains.reorder = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK",
   "WSB"), strain.names = c("AJ", "B6", "129", "NOD", "NZO", "CAST",
   "PWK", "WSB"), strain.colors = c("#F0F000", "#808080", "#F08080",
-  "#1010F0", "#00A0F0", "#00A000", "#F00000", "#9000E0"))
+  "#1010F0", "#00A0F0", "#00A000", "#F00000", "#9000E0"), strain.cex = 1)
 }
 \arguments{
 \item{mother.str.var}{Name of variable encoding the mother/dam strain identity.}
@@ -32,6 +32,8 @@ By default, renames strains to the slightly abbreviated Collaborative Cross labe
 
 \item{strain.colors}{DEFAULT: c("#F0F000", "#808080", "#F08080", "#1010F0", "#00A0F0", "#00A000", "#F00000", "#9000E0").
 By default, the standard Collaborative Cross colors are specified.}
+
+\item{strain.cex}{DEFAULT: 1. Specifies the size of strain labels.}
 }
 \description{
 This function produces a heatmap of the mean phenotypes per diallel cell, providing a visualization of

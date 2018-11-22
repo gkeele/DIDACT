@@ -17,6 +17,7 @@
 #' @param include.prefix DEFAULT: TRUE. If TRUE, effect type included on y-axis label as a prefix.
 #' @param zero.lty DEFAULT: 2. The line type of the vertical line at 0.
 #' @param zero.color DEFAULT: "gray". The color of the vertical line at 0.
+#' @param effect.label.cex DEFAULT: 0.5. Specifies the size of the effect labels.
 #' @export caterpillar.plot
 #' @examples caterpillar.plot()
 caterpillar.plot <- function(gibbs.object, 
@@ -31,7 +32,8 @@ caterpillar.plot <- function(gibbs.object,
                              include.grid = TRUE,
                              include.prefix = TRUE,
                              zero.lty = 2,
-                             zero.color = "gray"){
+                             zero.color = "gray",
+                             effect.label.cex = 0.5){
   mcmc.object <- gibbs.object$mcmc
   
   # Processing the plotted variables
@@ -129,7 +131,7 @@ caterpillar.plot <- function(gibbs.object,
        line = -1.5, 
        las = 2, 
        tck = -0.005, 
-       cex.axis = 0.5)
+       cex.axis = effect.label.cex)
 }
 
 #' Heatmap of mean phenotype for diallel cross.
@@ -149,6 +151,7 @@ caterpillar.plot <- function(gibbs.object,
 #' By default, renames strains to the slightly abbreviated Collaborative Cross labels.
 #' @param strain.colors DEFAULT: c("#F0F000", "#808080", "#F08080", "#1010F0", "#00A0F0", "#00A000", "#F00000", "#9000E0").
 #' By default, the standard Collaborative Cross colors are specified.
+#' @param strain.cex DEFAULT: 1. Specifies the size of strain labels.
 #' @export diallel.phenotype.map
 #' @examples diallel.phenotype.map
 diallel.phenotype.map <- function(mother.str.var, 
@@ -160,7 +163,8 @@ diallel.phenotype.map <- function(mother.str.var,
                                   strains.reorder = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
                                   strain.names = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
                                   strain.colors = c("#F0F000", "#808080", "#F08080", "#1010F0", 
-                                                    "#00A0F0", "#00A000", "#F00000", "#9000E0")){
+                                                    "#00A0F0", "#00A000", "#F00000", "#9000E0"),
+                                  strain.cex = 1){
   if (do.reorder) {
     data[,mother.str.var] <- factor(data[,mother.str.var], levels=strains.reorder)
     data[,father.str.var] <- factor(data[,father.str.var], levels=strains.reorder)
@@ -198,7 +202,9 @@ diallel.phenotype.map <- function(mother.str.var,
           xlab = expression(bold("Paternal")), 
           ylab = expression(bold("Maternal")), 
           col = my_palette, 
-          main = paste("Observed mean", phenotype.title))
+          main = paste("Observed mean", phenotype.title),
+          cexRow = strain.cex,
+          cexCol = strain.cex)
 }
 
 #' Phenotype ramp plot for diallel cross.
@@ -264,6 +270,8 @@ diallel.phenotype.scale <- function(mother.str.var,
 #' @param include.rank DEFAULT: FALSE. If TRUE, the rank of mean posterior utility is included on the cross 
 #' square.
 #' @param rank.col DEFAULT: "red". The color of the rank index included on the square.
+#' @param label.cex DEFAULT: 1.1. Specifies the size of the strain labels.
+#' @param label.padj DEFAULT: -0.3. Specifies how much the strain label is shifted from the square.
 #' @export diallelPlotter
 #' @examples diallelPlotter()
 diallelPlotter <- function(results, 
@@ -289,6 +297,8 @@ diallelPlotter <- function(results,
                            include.rank = FALSE,
                            rank = NULL,
                            rank.col = "red",
+                           label.cex = 1.1,
+                           label.padj = -0.3,
                            ...){
   cross.type <- cross.type[1]
   utility.type <- utility.type[1]
@@ -339,7 +349,7 @@ diallelPlotter <- function(results,
   par(mfrow = c(num.strains, num.strains), 
       cex = 0.5, 
       oma = c(1, 1, 1, 0), 
-      mar = c(1, 1, 1, 1))
+      mar = c(1, 3, 3, 1))
   ## CHOOSE SUBSET OF DATA
   for (i in 1:num.strains) {
     for (j in 1:num.strains) {
@@ -622,21 +632,21 @@ diallelPlotter <- function(results,
       if (j %in% label.indices & i == 1) {
         if (include.biparent.labels) {
           mtext(paste(ifelse(is.null(strains.relabel), strains[j], strains.relabel[j]), "(B)"), 
-                side = 3, cex = 1.1, padj = -0.3)
+                side = 3, cex = label.cex, padj = label.padj)
         }
         else {
           mtext(ifelse(is.null(strains.relabel), strains[j], strains.relabel[j]), 
-                side = 3, cex = 1.1, padj = -0.3)
+                side = 3, cex = label.cex, padj = label.padj)
         }
       }
       if (i %in% label.indices & j == 1) {
         if (include.biparent.labels) {
           mtext(paste(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), "(A)"), 
-                side = 2, cex = 1.1, padj = -0.3)
+                side = 2, cex = label.cex, padj = label.padj)
         }
         else {
           mtext(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), 
-                side = 2, cex = 1.1, padj = -0.3)
+                side = 2, cex = label.cex, padj = label.padj)
         }
       }
     }

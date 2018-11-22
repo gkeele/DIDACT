@@ -14,7 +14,7 @@ diallelPlotter(results, utility.type = c("power", "contrasts"),
   density.col = "white", border.col = "black",
   median.line.col = "black", absolute.density.scale = TRUE,
   include.info.plot = TRUE, include.rank = FALSE, rank = NULL,
-  rank.col = "red", ...)
+  rank.col = "red", label.cex = 1.1, label.padj = -0.3, ...)
 }
 \arguments{
 \item{results}{Samples of posterior utility produced by evaluate.experiments().}
@@ -66,6 +66,10 @@ included in square.}
 square.}
 
 \item{rank.col}{DEFAULT: "red". The color of the rank index included on the square.}
+
+\item{label.cex}{DEFAULT: 1.1. Specifies the size of the strain labels.}
+
+\item{label.padj}{DEFAULT: -0.3. Specifies how much the strain label is shifted from the square.}
 }
 \description{
 This function takes posterior samples of utilities from evaluate.experiments() and produces a grid plot

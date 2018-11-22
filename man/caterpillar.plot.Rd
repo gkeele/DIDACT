@@ -10,7 +10,8 @@ caterpillar.plot(gibbs.object, override.title = NULL,
   "black", "#A6CEE3", "#B2DF8A", "#FDBF6F", "#CAB2D6", "#D2B48C", "black"),
   inbred.penalty.col = "#FB9A99", rev.strain.output = TRUE,
   manual.limits = NULL, override.col = NULL, include.grid = TRUE,
-  include.prefix = TRUE, zero.lty = 2, zero.color = "gray")
+  include.prefix = TRUE, zero.lty = 2, zero.color = "gray",
+  effect.label.cex = 0.5)
 }
 \arguments{
 \item{gibbs.object}{Posterior samples from the BayesDiallel model fit with diallel.gibbs().}
@@ -40,6 +41,8 @@ Colors corresponding to the effect types.}
 \item{zero.lty}{DEFAULT: 2. The line type of the vertical line at 0.}
 
 \item{zero.color}{DEFAULT: "gray". The color of the vertical line at 0.}
+
+\item{effect.label.cex}{DEFAULT: 0.5. Specifies the size of the effect labels.}
 }
 \description{
 This function produces a caterpillar plot for samples from BayesDiallel posterior distributions.
