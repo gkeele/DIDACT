@@ -22,6 +22,7 @@ caterpillar.plot(chgb.par)
 chgb.par.exp = evaluate.experiments(chgb.par, n=500, qtl.num=1)
 diallelPlotter(results= chgb.par.exp, cross.type="f2", qtl.num=1, include.bar.plots = FALSE, include.density = FALSE, include.rank = TRUE, include.info.plot = FALSE)
 diallelPlotter(results= chgb.par.exp, cross.type="bc", qtl.num=1, include.bar.plots = FALSE, include.density = FALSE, include.rank = TRUE, include.info.plot = FALSE)
-diallelPlotter(results= chgb.par.exp, cross.type="rbc1", qtl.num=1)
+diallelPlotter(results= chgb.par.exp, cross.type="rbc1", qtl.num=1, include.bar.plots = FALSE, include.density = FALSE, include.rank = TRUE, include.info.plot
+ = FALSE)
 diallelPlotter(results= chgb.par.exp, cross.type="rbc2", qtl.num=1, include.bar.plots = FALSE, include.density = FALSE, include.rank = TRUE, include.info.plot = FALSE)
 ```
