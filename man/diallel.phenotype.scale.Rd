@@ -4,7 +4,8 @@
 \alias{diallel.phenotype.scale}
 \title{Phenotype ramp plot for diallel cross.}
 \usage{
-diallel.phenotype.scale(mother.str.var, father.str.var, phenotype, data)
+diallel.phenotype.scale(mother.str.var, father.str.var, phenotype, data,
+  include.decimal = FALSE)
 }
 \arguments{
 \item{mother.str.var}{Name of variable encoding the mother/dam strain identity.}
@@ -14,6 +15,8 @@ diallel.phenotype.scale(mother.str.var, father.str.var, phenotype, data)
 \item{phenotype}{Name of the phenotype variable. A quantitative phenotype is expected.}
 
 \item{data}{The data.frame that contains the phenotype and parental strain identities.}
+
+\item{include.decimal}{DEFAULT: FALSE. If FALSE, the scale labels are rounded to whole numbers.}
 }
 \description{
 This function produces a phenotype ramp to match the heatmap from diallel.phenotype.map().

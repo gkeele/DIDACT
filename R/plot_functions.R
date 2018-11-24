@@ -215,24 +215,37 @@ diallel.phenotype.map <- function(mother.str.var,
 #' @param father.str.var Name of variable encoding the father/sire strain identity.
 #' @param phenotype Name of the phenotype variable. A quantitative phenotype is expected.
 #' @param data The data.frame that contains the phenotype and parental strain identities.
+#' @param include.decimal DEFAULT: FALSE. If FALSE, the scale labels are rounded to whole numbers.
 #' @export diallel.phenotype.scale
 #' @examples diallel.phenotype.scale()
 diallel.phenotype.scale <- function(mother.str.var, 
                                     father.str.var, 
                                     phenotype, 
-                                    data){
+                                    data,
+                                    include.decimal = FALSE){
   my_palette <- colorRampPalette(c("white", "black"))(n = 299)
   
-  data$cross <- paste(data[,mother.str.var], data[,father.str.var], sep="x")
-  phenotype.summary <- aggregate(formula(paste(phenotype, "cross", sep="~")), data=data, FUN=mean, na.rm=TRUE)
+  data$cross <- paste(data[,mother.str.var], data[,father.str.var], sep = "x")
+  phenotype.summary <- aggregate(formula(paste(phenotype, "cross", sep = "~")), 
+                                 data = data, 
+                                 FUN = mean, 
+                                 na.rm = TRUE)
   
-  plot(c(1:length(my_palette)), rep(1,length(my_palette)), 
-       pch="|", col=my_palette, cex=3, ylab="", xlab="",
-       yaxt="n", frame.plot=FALSE, ylim=c(0.75, 1.25), xaxt="n",
+  plot(c(1:length(my_palette)), rep(1, length(my_palette)), 
+       pch = "|", col = my_palette, cex = 3, ylab = "", xlab = "",
+       yaxt = "n", frame.plot = FALSE, ylim = c(0.75, 1.25), xaxt = "n",
        xlim=c(0, 350))
-  labs <- signif(as.numeric(pretty(range(phenotype.summary[,phenotype], na.rm=TRUE))), digits=2)
-  axis(side=1, at=seq(from=1, to=length(my_palette), length.out=length(labs)),
-       labels=labs)
+  if (!include.decimal) {
+    labs <- signif(as.numeric(pretty(range(phenotype.summary[,phenotype], na.rm = TRUE))), digits = 2)
+  }
+  else {
+    labs <- round(as.numeric(pretty(range(phenotype.summary[,phenotype], na.rm = TRUE))), digits = 1)
+  }
+  axis(side=1, 
+       at = seq(from = 1, 
+                to = length(my_palette), 
+                length.out = length(labs)),
+       labels = labs)
 }
 
 
@@ -782,10 +795,11 @@ make.gradient.scale <- function(spectrum = make.spectrum(c("white", "black"), n 
             axes = FALSE)
     if (utility.type == "power") {
       axis(1, at = c(0, 1))
-      mtext(side = 1, text = "Posterior power", line = 3)
+      mtext(side = 1, text = "Posterior power", line = 3, cex = 1.5)
     }
     else {
-      mtext(side = 1, text = "Posterior contrast", line = 3)
+      axis(1, at = c(0, 1), labels = c("low", "high"))
+      mtext(side = 1, text = "Posterior contrast", line = 3, cex = 1.5)
     }
   }
   else {
@@ -800,10 +814,11 @@ make.gradient.scale <- function(spectrum = make.spectrum(c("white", "black"), n 
             horiz = TRUE)
     if (utility.type == "power") {
       axis(4, las = 1, at = c(0, 1))
-      mtext(side = 1, text = "Posterior power")
+      mtext(side = 1, text = "Posterior power", cex = 1.5, line = 2)
     }
     else {
-      mtext(side = 1, text = "Posterior contrast")
+      axis(4, las = 1, at = c(0, 1), labels = c("low", "high"))
+      mtext(side = 1, text = "Posterior contrast", cex = 1.5, line = 2)
     }
   }
 }
