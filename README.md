@@ -21,7 +21,7 @@ chgb.par <- diallel.gibbs(phenotype=advia.dat$cHGB, sex=as.numeric(advia.dat$is.
 caterpillar.plot(chgb.par)
 chgb.par.exp = evaluate.experiments(chgb.par, n=500, qtl.num=1)
 diallelPlotter(results= chgb.par.exp, cross.type="f2", include.bar.plots = FALSE, include.density = FALSE, include.rank = TRUE, include.info.plot = FALSE, utility.type = "contrasts")
-diallelPlotter(results= chgb.par.exp, cross.type="bc", qtl.num=1, include.bar.plots = FALSE, include.density = FALSE, include.rank = TRUE, include.info.plot = FALSE, utility.type = "contrasts")
-diallelPlotter(results= chgb.par.exp, cross.type="rbc1", qtl.num=1, include.bar.plots = FALSE, include.density = FALSE, include.rank = TRUE, include.info.plot = FALSE, utility.type = "contrasts")
-diallelPlotter(results= chgb.par.exp, cross.type="rbc2", qtl.num=1, include.bar.plots = FALSE, include.density = FALSE, include.rank = TRUE, include.info.plot = FALSE, utility.type = "contrasts")
+diallelPlotter(results= chgb.par.exp, cross.type="bc", include.bar.plots = FALSE, include.density = FALSE, include.rank = TRUE, include.info.plot = FALSE, utility.type = "contrasts")
+diallelPlotter(results= chgb.par.exp, cross.type="rbc1", include.bar.plots = FALSE, include.density = FALSE, include.rank = TRUE, include.info.plot = FALSE, utility.type = "contrasts")
+diallelPlotter(results= chgb.par.exp, cross.type="rbc2", include.bar.plots = FALSE, include.density = FALSE, include.rank = TRUE, include.info.plot = FALSE, utility.type = "contrasts")
 ```
