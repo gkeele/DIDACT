@@ -756,6 +756,58 @@ infoPlotter <- function(trait,
   text(x=0.5, 0.2, labels="Posterior mean utility", cex=1.3)
 }
 
+#' Gradient scale for posterior utility from DIDACT grid plot.
+#' 
+#' This function produces a gradient scale that can be used with a DIDACT grid plot.
+#' 
+#' @param spectrum DEFAULT: make.spectrum(c("white", "black"), n = 100). The color spectrum to be used in the gradient.
+#' @param mode DEFAULT: "horizontal". Specifies whether the gradient is horizontally or vertically oriented.
+#' @param utility.type DEFAULT: "power". Specifies whether the utility function is power or contrasts.
+#' @export make.gradient.scale
+#' @examples make.gradient.scale()
+make.gradient.scale <- function(spectrum = make.spectrum(c("white", "black"), n = 100),
+                                mode = c("horizontal", "vertical"),
+                                utility.type = c("power", "contrasts")) {
+  mode <- mode[1]
+  utility.type <- utility.type[1]
+  
+  if (mode == "horizontal") {
+    barplot(height = rep(0.1, length(spectrum)), 
+            width = 1/length(spectrum), 
+            density = 1000, 
+            angle = 90, 
+            col = spectrum,
+            border = FALSE, 
+            space = FALSE, 
+            axes = FALSE)
+    if (utility.type == "power") {
+      axis(1, at = c(0, 1))
+      mtext(side = 1, text = "Posterior power", line = 3)
+    }
+    else {
+      mtext(side = 1, text = "Posterior contrast", line = 3)
+    }
+  }
+  else {
+    barplot(height = rep(0.1, length(spectrum)), 
+            width = 1/length(spectrum), 
+            density = 1000, 
+            angle = 0, 
+            col = spectrum,
+            border = FALSE, 
+            space = FALSE, 
+            axes = FALSE,
+            horiz = TRUE)
+    if (utility.type == "power") {
+      axis(4, las = 1, at = c(0, 1))
+      mtext(side = 1, text = "Posterior power")
+    }
+    else {
+      mtext(side = 1, text = "Posterior contrast")
+    }
+  }
+}
+
 f2boxPlotter <- function(hom1.vec, 
                          hom2.vec, 
                          het.vec, 
