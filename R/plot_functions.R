@@ -336,7 +336,8 @@ diallelPlotter <- function(results,
     x.high <- qtl.num
   }
   else if (utility.type == "contrasts") {
-    x.high <- max(sapply(1:length(results$var), function(y) max(sapply(1:length(results$var[[y]]), function(x) max(results$var[[y]][[x]])))))
+    #x.high <- max(sapply(1:length(results$var), function(y) max(sapply(1:length(results$var[[y]]), function(x) max(results$var[[y]][[x]])))))
+    x.high <- 100
   }
 
   absolute.max <- NULL
@@ -1137,7 +1138,8 @@ make.single.cross.plot <- function(cross,
     x.high <- qtl.num
   }
   else if (utility.type == "contrasts") {
-    x.high <- max(sapply(1:length(didact.object$var), function(y) max(sapply(1:length(didact.object$var[[y]]), function(x) max(didact.object$var[[y]][[x]])))))
+    #x.high <- max(sapply(1:length(didact.object$var), function(y) max(sapply(1:length(didact.object$var[[y]]), function(x) max(didact.object$var[[y]][[x]])))))
+    x.high <- 100
   }
   oneParamPlotter(cross.utility = this.cross.utility,
                   cross.type = cross.type,
@@ -1154,6 +1156,13 @@ make.single.cross.plot <- function(cross,
                   include.rank = FALSE,
                   back.allele = back.allele,
                   ...)
+  if (utility.type == "power") {
+    axis(side = 1, at = c(0, 1), labels = c("low", "high"))
+  }
+  else {
+    axis(side = 1, at = c(0, 100), labels = c("low", "high"))
+  }
+  mtext(side = 1, text = "Posterior utility", line = 2.5)
 }
 
 calc.ranks <- function(utility.list,
