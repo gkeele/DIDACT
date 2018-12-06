@@ -1,6 +1,6 @@
 Package: DIDACT
 Title: Diallel Informed Decision theoretic Approach for Crosses Tool (DIDACT)
-Version: 0.1
+Version: 1.1.1
 Authors@R: c(person("Paul", "Maurizio", role = "aut"), 
              person("Daniel", "Oreper", role = "aut"),
 	     person("William", "Valdar", role = "aut"),  
