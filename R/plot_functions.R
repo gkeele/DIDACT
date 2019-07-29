@@ -668,6 +668,9 @@ diallelPlotter <- function(results,
   if (!is.null(path)) {
     dev.off()
   }
+  if (is.null(path)) {
+    par(mfrow = c(1, 1))
+  }
 }
 
 

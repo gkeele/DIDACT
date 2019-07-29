@@ -112,6 +112,7 @@ simulate.diallel <- function(M = 8,
     resid <- resid*sqrt(noise.var)
     return(resid)
   }
+  #browser()
   
   y <- sapply(1:num.sim, function(x) y.pred + sample.scaled.resid(n = length(y.pred), noise.var = noise.var))
   colnames(y) <- paste0("y.sim.", 1:num.sim)
@@ -170,5 +171,107 @@ make.all.pairs.matrix <- function(strains){
     }
   }
   return(pair.matrix)
+}
+
+#' @export simulate.prior.diallel
+#' @examples simulate.prior.diallel()
+simulate.prior.diallel <- function(M = 8,
+                                   n.each = 5, 
+                                   num.sim = 1, 
+                                   strains = LETTERS[1:M],
+                                   hyper.ga.alpha = 0.002,
+                                   hyper.ga.beta = 2){
+  
+  # Simulate fixed effects
+  mu <- rnorm(1, mean = 0, sd = sqrt(1000))
+  female.mu <- rnorm(1, mean = 0, sd = sqrt(1000))
+  inbred.mu <- rnorm(1, mean = 0, sd = sqrt(1000))
+  
+  ## Simulate diallel effects
+  # add
+  tau.add <- Inf
+  while (is.infinite(tau.add)) {
+    tau.add <- 1/rgamma(1, shape = hyper.ga.alpha/2, rate = hyper.ga.beta/2)
+  }
+  add.effect <- rnorm(n = M, mean = 0, sd = sqrt(tau.add))
+  names(add.effect) <- strains
+  # inbred
+  tau.inbred <- Inf
+  while (is.infinite(tau.inbred)) {
+    tau.inbred <- 1/rgamma(1, shape = hyper.ga.alpha/2, rate = hyper.ga.beta/2)
+  }
+  tau.inbred <- rgamma(1, shape = hyper.ga.alpha/2, rate = hyper.ga.beta/2)
+  inbred.effect <- rnorm(n = M, mean = 0, sd = sqrt(tau.inbred))
+  names(inbred.effect) <- strains
+  # symmetric epistatic
+  tau.epi.sym <- Inf
+  while (is.infinite(tau.epi.sym)) {
+    tau.epi.sym <- 1/rgamma(1, shape = hyper.ga.alpha/2, rate = hyper.ga.beta/2)
+  }
+  epi.sym.effect <- rnorm(n = choose(M, 2), mean = 0, sd = sqrt(tau.epi.sym))
+  names(epi.sym.effect) <- make.pairs(strains)
+  # asymmetric epistatic
+  tau.epi.asym <- Inf
+  while (is.infinite(tau.epi.asym)) {
+    tau.epi.asym <- 1/rgamma(1, shape = hyper.ga.alpha/2, rate = hyper.ga.beta/2)
+  }
+  epi.asym.effect <- rnorm(n = choose(M, 2), mean = 0, sd = sqrt(tau.epi.asym))
+  names(epi.asym.effect) <- make.pairs(strains)
+  # maternal
+  tau.maternal <- Inf
+  while (is.infinite(tau.maternal)) {
+    tau.maternal <- 1/rgamma(1, shape = hyper.ga.alpha/2, rate = hyper.ga.beta/2)
+  }
+  maternal.effect <- rnorm(n = M, mean = 0, sd = sqrt(tau.maternal))
+  names(maternal.effect) <- strains
+  # residual 
+  sigma.2 <- Inf
+  while (is.infinite(sigma.2)) {
+    sigma.2 <- 1/rgamma(1, shape = hyper.ga.alpha/2, rate = hyper.ga.beta/2)
+  }
+  e <- rnorm(n = n.each*M^2, mean = 0, sd = sqrt(sigma.2))
+  
+  ########################### Making component design matrices
+  init.matrix <- diag(M); rownames(init.matrix) <- strains
+  
+  all.individuals <- make.all.pairs.matrix(strains)[sort(rep(1:length(strains)^2, times=n.each)),]; colnames(all.individuals) <- c("dam.id", "sire.id")
+  dam.matrix <- init.matrix[all.individuals[, "dam.id"],]
+  sire.matrix <- init.matrix[all.individuals[, "sire.id"],]
+  
+  ###### Additive
+  add.matrix <- dam.matrix + sire.matrix; colnames(add.matrix) <- strains
+  
+  ###### Maternal
+  maternal.matrix <- dam.matrix - sire.matrix; colnames(maternal.matrix) <- strains
+  
+  ###### Inbred
+  inbred.matrix <- add.matrix - 1
+  inbred.matrix[inbred.matrix == -1] <- 0
+  inbred.fixed.effect <- rowSums(inbred.matrix); colnames(inbred.matrix) <- strains
+  
+  epi.init.matrix <- diag(choose(M, 2)); rownames(epi.init.matrix) <- make.pairs(strains)
+  inbred.portion.epi.init.matrix <- matrix(0, nrow=M, ncol=choose(M, 2)); rownames(inbred.portion.epi.init.matrix) <- paste(strains, strains, sep=".")
+  epi.init.matrix <- rbind(inbred.portion.epi.init.matrix, epi.init.matrix)
+  
+  ###### Epistatic
+  epi.sym.matrix <- epi.init.matrix[apply(all.individuals, 1, function(x) paste(sort(x), collapse=".")),]; colnames(epi.sym.matrix) <- make.pairs(strains)
+  
+  asym.flip <- !apply(all.individuals, 1, function(x) paste(x, collapse=".")) == apply(all.individuals, 1, function(x) paste(sort(x), collapse="."))
+  epi.asym.matrix <- epi.sym.matrix
+  epi.asym.matrix[asym.flip,] <- -1*epi.sym.matrix[asym.flip,]
+  
+  ###### Sex
+  is.female <- rbinom(n = n.each*M^2, size = 1, prob = 0.5)
+  
+  ###### Simulation
+  #noise.var <- 1 - add.size - inbred.size - epi.sym.size - epi.asym.size - maternal.size
+  y <- mu + is.female*female.mu + add.matrix %*% add.effect + inbred.fixed.effect*inbred.mu + inbred.matrix %*% inbred.effect + maternal.matrix %*% maternal.effect + epi.sym.matrix %*% epi.sym.effect + epi.asym.matrix %*% epi.asym.effect + e
+  rownames(y) <- NULL
+  
+  colnames(y) <- paste0("y.sim.", 1:num.sim)
+  
+  diallel.data <- data.frame(y, is.female, dam.id = all.individuals[,"dam.id"], sire.id = all.individuals[,"sire.id"])
+  
+  return(diallel.data)
 }
 

@@ -11,7 +11,7 @@ diallel.gibbs(phenotype, sex, is.female = TRUE, mother.str, father.str,
   tau_epi_asym.starter = 2, strains.reorder = c("AJ", "B6", "129",
   "NOD", "NZO", "CAST", "PWK", "WSB"), strains.rename = c("AJ", "B6",
   "129", "NOD", "NZO", "CAST", "PWK", "WSB"), use.constraint = TRUE,
-  use.progress.bar = TRUE)
+  use.progress.bar = TRUE, hyper.ga.alpha = 0.002, hyper.ga.beta = 2)
 }
 \arguments{
 \item{phenotype}{Vector of the phenotypes. Expects a quantitative phenotype.}

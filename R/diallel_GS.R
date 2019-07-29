@@ -93,7 +93,10 @@ diallel.gibbs <- function(phenotype,
                           strains.reorder = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
                           strains.rename = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK", "WSB"),
                           use.constraint = TRUE,
-                          use.progress.bar = TRUE) {
+                          use.progress.bar = TRUE,
+                          ## hyperparameters
+                          hyper.ga.alpha = 0.002,
+                          hyper.ga.beta = 2) {
   if (!is.null(strains.reorder)){
     mother.str <- factor(mother.str, levels=strains.reorder)
     father.str <- factor(father.str, levels=strains.reorder)
@@ -197,10 +200,6 @@ diallel.gibbs <- function(phenotype,
     n.col <- 3 + 3*num.strains + 2*choose(num.strains, 2) + 6
     p.mat <- matrix(0, n.iter, n.col) # 3 fixed effects, 8 additive, 8 inbred, 8 maternal, 28 epistatic symmetric, 28 epistatic asymmetric
     
-    # Set hyperparameters
-    ga.alpha <- 0.002
-    ga.beta <- 2
-    
     # Initialization
     fix.vec <- c(mean(phenotype[sex==0]), mean(phenotype[sex==1]), 0)
     rand.vec <- rnorm(ncol(X.all) - 3, 0, 20)
@@ -242,27 +241,27 @@ diallel.gibbs <- function(phenotype,
       beta.vec <- update.beta(X.all, y, sigma.2, Sigma0)
       
       # Update sigma.2
-      sigma.2 <- update.sigma.2(X.all, y, ga.alpha, ga.beta, beta.vec)
+      sigma.2 <- update.sigma.2(X.all, y, hyper.ga.alpha, hyper.ga.beta, beta.vec)
       
       # Updating tau_add
       a.index <- 4:(4 + ncol(add.part) - 1)
-      tau_add <- update.tau(diag(ncol(add.part)), ga.alpha, ga.beta, beta.vec[a.index])
+      tau_add <- update.tau(diag(ncol(add.part)), hyper.ga.alpha, hyper.ga.beta, beta.vec[a.index])
       
       # Updating tau_inbred
       i.index <- (4 + ncol(add.part)):(4 + ncol(add.part) + ncol(inbred.part) - 1)
-      tau_inbred <- update.tau(diag(ncol(inbred.part)), ga.alpha, ga.beta, beta.vec[i.index])
+      tau_inbred <- update.tau(diag(ncol(inbred.part)), hyper.ga.alpha, hyper.ga.beta, beta.vec[i.index])
       
       # Updating tau_mat
       m.index <- (4 + ncol(add.part) + ncol(inbred.part)):(4 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part) - 1)
-      tau_mat <- update.tau(diag(ncol(mat.part)), ga.alpha, ga.beta, beta.vec[m.index])
+      tau_mat <- update.tau(diag(ncol(mat.part)), hyper.ga.alpha, hyper.ga.beta, beta.vec[m.index])
       
       # Updating tau_epi_sym
       e_sym.index <- (4 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part)):(4 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part) + ncol(epi_sym.part) - 1)
-      tau_epi_sym <- update.tau(diag(ncol(epi_sym.part)), ga.alpha, ga.beta, beta.vec[e_sym.index])
+      tau_epi_sym <- update.tau(diag(ncol(epi_sym.part)), hyper.ga.alpha, hyper.ga.beta, beta.vec[e_sym.index])
       
       # Updating tau_epi_asym
       e_asym.index <- (4 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part) + ncol(epi_sym.part)):(4 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part) + ncol(epi_sym.part) + ncol(epi_asym.part) - 1)
-      tau_epi_asym <- update.tau(diag(ncol(epi_asym.part)), ga.alpha, ga.beta, beta.vec[e_asym.index])
+      tau_epi_asym <- update.tau(diag(ncol(epi_asym.part)), hyper.ga.alpha, hyper.ga.beta, beta.vec[e_asym.index])
       
       if (i <= burn.in) {
         # Progresses burn-in progress bar
