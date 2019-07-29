@@ -173,6 +173,14 @@ make.all.pairs.matrix <- function(strains){
   return(pair.matrix)
 }
 
+#' Simulate diallel data from the diffuse priors of the BayesDiallel model
+#'
+#' This function generates data from the BayesDiallel model, based on the default diffuse priors. 
+#' It does not currently allow for sex interactions with strain-level effects, as is possible 
+#' in the proper BayesDiallel package.
+#'
+#' @param M DEFAULT: 8. The number of strains in the diallel cross. Default of 8 is the number of founders in the Collaborative Cross.
+#'
 #' @export simulate.prior.diallel
 #' @examples simulate.prior.diallel()
 simulate.prior.diallel <- function(M = 8,
