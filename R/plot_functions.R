@@ -202,7 +202,7 @@ diallel.phenotype.map <- function(mother.str.var,
           xlab = expression(bold("Paternal")), 
           ylab = expression(bold("Maternal")), 
           col = my_palette, 
-          main = paste("Observed mean", phenotype.title),
+          main = paste("Mean", phenotype.title),
           cexRow = strain.cex,
           cexCol = strain.cex)
 }
