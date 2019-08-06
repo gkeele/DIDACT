@@ -780,11 +780,15 @@ infoPlotter <- function(trait,
 #' @param spectrum DEFAULT: make.spectrum(c("white", "black"), n = 100). The color spectrum to be used in the gradient.
 #' @param mode DEFAULT: "horizontal". Specifies whether the gradient is horizontally or vertically oriented.
 #' @param utility.type DEFAULT: "power". Specifies whether the utility function is power or contrasts.
+#' @param title.cex DEFAULT: 1.5. Specifies the text size of the gradient title.
+#' @param axis.cex DEFAULT: 1.5. Specifies the text size of the gradient labels.
 #' @export make.gradient.scale
 #' @examples make.gradient.scale()
 make.gradient.scale <- function(spectrum = make.spectrum(c("white", "black"), n = 100),
                                 mode = c("horizontal", "vertical"),
-                                utility.type = c("power", "contrasts")) {
+                                utility.type = c("power", "contrasts"),
+                                title.cex = 1.5,
+                                axis.cex = 1.5) {
   mode <- mode[1]
   utility.type <- utility.type[1]
   
@@ -798,12 +802,12 @@ make.gradient.scale <- function(spectrum = make.spectrum(c("white", "black"), n 
             space = FALSE, 
             axes = FALSE)
     if (utility.type == "power") {
-      axis(1, at = c(0, 1))
-      mtext(side = 1, text = "Posterior power", line = 3, cex = 1.5)
+      axis(1, at = c(0, 1), cex = axis.cex)
+      mtext(side = 1, text = "Posterior power", line = 3, cex.axis = text.cex)
     }
     else {
-      axis(1, at = c(0, 1), labels = c("low", "high"))
-      mtext(side = 1, text = "Posterior contrast", line = 3, cex = 1.5)
+      axis(1, at = c(0, 1), labels = c("low", "high"), cex.axis = axis.cex)
+      mtext(side = 1, text = "Posterior contrast", line = 3, cex = text.cex)
     }
   }
   else {
@@ -817,12 +821,12 @@ make.gradient.scale <- function(spectrum = make.spectrum(c("white", "black"), n 
             axes = FALSE,
             horiz = TRUE)
     if (utility.type == "power") {
-      axis(4, las = 1, at = c(0, 1))
-      mtext(side = 1, text = "Posterior power", cex = 1.5, line = 2)
+      axis(4, las = 1, at = c(0, 1), cex.axis = axis.cex)
+      mtext(side = 1, text = "Posterior power", cex = title.cex, line = 2)
     }
     else {
-      axis(4, las = 1, at = c(0, 1), labels = c("low", "high"))
-      mtext(side = 1, text = "Posterior contrast", cex = 1.5, line = 2)
+      axis(4, las = 1, at = c(0, 1), labels = c("low", "high"), cex.axis = axis.cex)
+      mtext(side = 1, text = "Posterior contrast", cex = title.cex, line = 2)
     }
   }
 }

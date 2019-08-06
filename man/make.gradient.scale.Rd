@@ -6,7 +6,7 @@
 \usage{
 make.gradient.scale(spectrum = make.spectrum(c("white", "black"), n =
   100), mode = c("horizontal", "vertical"), utility.type = c("power",
-  "contrasts"))
+  "contrasts"), title.cex = 1.5, axis.cex = 1.5)
 }
 \arguments{
 \item{spectrum}{DEFAULT: make.spectrum(c("white", "black"), n = 100). The color spectrum to be used in the gradient.}
@@ -14,6 +14,10 @@ make.gradient.scale(spectrum = make.spectrum(c("white", "black"), n =
 \item{mode}{DEFAULT: "horizontal". Specifies whether the gradient is horizontally or vertically oriented.}
 
 \item{utility.type}{DEFAULT: "power". Specifies whether the utility function is power or contrasts.}
+
+\item{title.cex}{DEFAULT: 1.5. Specifies the text size of the gradient title.}
+
+\item{axis.cex}{DEFAULT: 1.5. Specifies the text size of the gradient labels.}
 }
 \description{
 This function produces a gradient scale that can be used with a DIDACT grid plot.
