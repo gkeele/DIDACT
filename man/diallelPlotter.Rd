@@ -9,12 +9,13 @@ diallelPlotter(results, utility.type = c("power", "contrasts"),
   col.range = c("white", "black"), col.spectrum = c("blue2red", "gray",
   "green2red", "blue2green"), path = NULL, height = 12, width = 12,
   strains.relabel = NULL, include.off.x = TRUE,
-  include.biparent.labels = TRUE, include.density = TRUE,
-  include.var.pie = FALSE, include.bar.plots = TRUE,
-  density.col = "white", border.col = "black",
-  median.line.col = "black", absolute.density.scale = TRUE,
-  include.info.plot = TRUE, include.rank = FALSE, rank = NULL,
-  rank.col = "red", label.cex = 1.1, label.padj = -0.3, ...)
+  include.letter.labels = TRUE, include.asterisk.labels = FALSE,
+  include.density = TRUE, include.var.pie = FALSE,
+  include.bar.plots = TRUE, density.col = "white",
+  border.col = "black", median.line.col = "black",
+  absolute.density.scale = TRUE, include.info.plot = TRUE,
+  include.rank = FALSE, rank = NULL, rank.col = "red",
+  label.cex = 1.1, label.padj = -0.3, ...)
 }
 \arguments{
 \item{results}{Samples of posterior utility produced by evaluate.experiments().}
@@ -43,7 +44,9 @@ two colors included.}
 \item{include.off.x}{DEFAULT: TRUE. If TRUE, "X" is plotted on the diagonal and lower diagonal of the grids.
 If FALSE, square is left empty.}
 
-\item{include.biparent.labels}{DEFAULT: TRUE. If TRUE, arrows are included to signify backcross parent.}
+\item{include.letter.labels}{DEFAULT: TRUE. If TRUE, letters are included to indicate backcross parent.}
+
+\item{include.asterisk.labels}{DEFAULT: FALSE. If TRUE, asterisks are included to signify backcross parent.}
 
 \item{include.density}{DEFAULT: TRUE. If TRUE, histogram of posterior density is included in square.}
 

@@ -270,7 +270,8 @@ diallel.phenotype.scale <- function(mother.str.var,
 #' @param strains.relabel DEFAULT: NULL. Option to re-label the strains.
 #' @param include.off.x DEFAULT: TRUE. If TRUE, "X" is plotted on the diagonal and lower diagonal of the grids.
 #' If FALSE, square is left empty.
-#' @param include.biparent.labels DEFAULT: TRUE. If TRUE, arrows are included to signify backcross parent.
+#' @param include.letter.labels DEFAULT: TRUE. If TRUE, letters are included to indicate backcross parent.
+#' @param include.asterisk.labels DEFAULT: FALSE. If TRUE, asterisks are included to signify backcross parent.
 #' @param include.density DEFAULT: TRUE. If TRUE, histogram of posterior density is included in square.
 #' @param include.var.pie DEFAULT: FALSE. If TRUE, pie chart of phenotypic variance is included in square.
 #' @param include.bar.plots DEFAULT: TRUE. If TRUE, box plots of posterior genotype class phenotypes are 
@@ -298,7 +299,8 @@ diallelPlotter <- function(results,
                            width = 12,
                            strains.relabel = NULL,
                            include.off.x = TRUE,
-                           include.biparent.labels = TRUE,
+                           include.letter.labels = TRUE,
+                           include.asterisk.labels = FALSE,
                            include.density = TRUE,
                            include.var.pie = FALSE,
                            include.bar.plots = TRUE,
@@ -644,7 +646,7 @@ diallelPlotter <- function(results,
         }
       }
       if (j %in% label.indices & i == 1) {
-        if (include.biparent.labels) {
+        if (include.letter.labels) {
           mtext(paste(ifelse(is.null(strains.relabel), strains[j], strains.relabel[j]), "(B)"), 
                 side = 3, cex = label.cex, padj = label.padj)
         }
@@ -654,8 +656,12 @@ diallelPlotter <- function(results,
         }
       }
       if (i %in% label.indices & j == 1) {
-        if (include.biparent.labels) {
+        if (include.letter.labels) {
           mtext(paste(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), "(A)"), 
+                side = 2, cex = label.cex, padj = label.padj)
+        }
+        else if (include.asterisk.labels) {
+          mtext(paste(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), "(*)"), 
                 side = 2, cex = label.cex, padj = label.padj)
         }
         else {
