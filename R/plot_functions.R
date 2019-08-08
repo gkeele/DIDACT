@@ -661,7 +661,7 @@ diallelPlotter <- function(results,
                 side = 2, cex = label.cex, padj = label.padj)
         }
         else if (include.asterisk.labels) {
-          mtext(paste(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), "(*)"), 
+          mtext(paste(ifelse(is.null(strains.relabel), strains[i], strains.relabel[i]), "*"), 
                 side = 2, cex = label.cex, padj = label.padj)
         }
         else {
