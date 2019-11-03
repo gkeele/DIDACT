@@ -76,7 +76,7 @@ update.tau <- function(K,
 #' @export diallel.gibbs
 #' @examples diallel.gibbs()
 diallel.gibbs <- function(phenotype, 
-                          sex, 
+                          sex = NULL, 
                           is.female = TRUE, 
                           mother.str, 
                           father.str, 
@@ -141,12 +141,20 @@ diallel.gibbs <- function(phenotype,
   n <- length(y)
   
   # By default: female = 1, male = 0
-  if(!is.female){
+  if (!is.female & !is.null(sex)) {
     sex <- ifelse(sex, 1, 0)
   } 
   
   # Make X
-  X <- cbind(rep(1, n), sex, ifelse(mother.str == father.str, 1, 0))
+  X <- matrix(rep(1, n), ncol = 1)
+  if (!is.null(sex)) {
+    X <- cbind(X, sex)
+  }
+  X <- cbind(X, ifelse(mother.str == father.str, 1, 0))
+  num.fixef <- ncol(X)
+  
+  # Logical for whether sex is modeled
+  sex.included <- ifelse(!is.null(sex), TRUE, FALSE)
   
   # Setting up Z
   # Additive
@@ -197,12 +205,17 @@ diallel.gibbs <- function(phenotype,
   } 
   for (j in 1:multi.chain) {
     # Allocate memory
-    n.col <- 3 + 3*num.strains + 2*choose(num.strains, 2) + 6
+    n.col <- num.fixef + 3*num.strains + 2*choose(num.strains, 2) + 6
     p.mat <- matrix(0, n.iter, n.col) # 3 fixed effects, 8 additive, 8 inbred, 8 maternal, 28 epistatic symmetric, 28 epistatic asymmetric
     
     # Initialization
-    fix.vec <- c(mean(phenotype[sex==0]), mean(phenotype[sex==1]), 0)
-    rand.vec <- rnorm(ncol(X.all) - 3, 0, 20)
+    if (!is.null(sex)) {
+      fix.vec <- c(mean(phenotype[sex==0]), mean(phenotype[sex==1]), 0)
+    }
+    else {
+      fix.vec <- c(mean(phenotype), 0)
+    }
+    rand.vec <- rnorm(ncol(X.all) - num.fixef, 0, 20)
     beta.vec <- c(fix.vec, rand.vec)
     
     sigma.2 <- sigma.2.starter
@@ -218,7 +231,7 @@ diallel.gibbs <- function(phenotype,
     # Updating parameters
     for(i in 1:((n.iter*thin)+burn.in)){
       # prior covariance matrix
-      Sigma0 <- diag(c(rep(1000, 3), 
+      Sigma0 <- diag(c(rep(1000, num.fixef), 
                        rep(tau_add, ncol(add.part)),
                        rep(tau_inbred, ncol(inbred.part)), 
                        rep(tau_mat, ncol(mat.part)),
@@ -235,8 +248,6 @@ diallel.gibbs <- function(phenotype,
       #                      byrow=TRUE, nrow=8, ncol=8)*tau_add
       # Sigma0[4:11,4:11] <- constraint + diag(8)*0.01
       
-      
-      
       # Update beta.vec
       beta.vec <- update.beta(X.all, y, sigma.2, Sigma0)
       
@@ -244,23 +255,23 @@ diallel.gibbs <- function(phenotype,
       sigma.2 <- update.sigma.2(X.all, y, hyper.ga.alpha, hyper.ga.beta, beta.vec)
       
       # Updating tau_add
-      a.index <- 4:(4 + ncol(add.part) - 1)
+      a.index <- (num.fixef + 1):(num.fixef + 1 + ncol(add.part) - 1)
       tau_add <- update.tau(diag(ncol(add.part)), hyper.ga.alpha, hyper.ga.beta, beta.vec[a.index])
       
       # Updating tau_inbred
-      i.index <- (4 + ncol(add.part)):(4 + ncol(add.part) + ncol(inbred.part) - 1)
+      i.index <- (num.fixef + 1 + ncol(add.part)):(num.fixef + 1 + ncol(add.part) + ncol(inbred.part) - 1)
       tau_inbred <- update.tau(diag(ncol(inbred.part)), hyper.ga.alpha, hyper.ga.beta, beta.vec[i.index])
       
       # Updating tau_mat
-      m.index <- (4 + ncol(add.part) + ncol(inbred.part)):(4 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part) - 1)
+      m.index <- (num.fixef + 1 + ncol(add.part) + ncol(inbred.part)):(num.fixef + 1 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part) - 1)
       tau_mat <- update.tau(diag(ncol(mat.part)), hyper.ga.alpha, hyper.ga.beta, beta.vec[m.index])
       
       # Updating tau_epi_sym
-      e_sym.index <- (4 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part)):(4 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part) + ncol(epi_sym.part) - 1)
+      e_sym.index <- (num.fixef + 1 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part)):(num.fixef + 1 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part) + ncol(epi_sym.part) - 1)
       tau_epi_sym <- update.tau(diag(ncol(epi_sym.part)), hyper.ga.alpha, hyper.ga.beta, beta.vec[e_sym.index])
       
       # Updating tau_epi_asym
-      e_asym.index <- (4 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part) + ncol(epi_sym.part)):(4 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part) + ncol(epi_sym.part) + ncol(epi_asym.part) - 1)
+      e_asym.index <- (num.fixef + 1 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part) + ncol(epi_sym.part)):(num.fixef + 1 + ncol(add.part) + ncol(inbred.part) + ncol(mat.part) + ncol(epi_sym.part) + ncol(epi_asym.part) - 1)
       tau_epi_asym <- update.tau(diag(ncol(epi_asym.part)), hyper.ga.alpha, hyper.ga.beta, beta.vec[e_asym.index])
       
       if (i <= burn.in) {
@@ -283,7 +294,7 @@ diallel.gibbs <- function(phenotype,
         }
         if ((i-1-burn.in) %% thin == 0) {
           if (use.constraint) {
-            p.mat[counter,] <- c(beta.vec[1:3], 
+            p.mat[counter,] <- c(beta.vec[1:num.fixef], 
                                  M.add %*% beta.vec[a.index],
                                  M.inbred %*% beta.vec[i.index],
                                  M.mat %*% beta.vec[m.index],
@@ -292,7 +303,8 @@ diallel.gibbs <- function(phenotype,
                                  sigma.2, tau_add, tau_inbred, tau_mat, tau_epi_sym, tau_epi_asym)
           }
           else {
-            p.mat[counter,] <- c(beta.vec, sigma.2, tau_add, tau_inbred, tau_mat, tau_epi_sym, tau_epi_asym)
+            p.mat[counter,] <- c(beta.vec, sigma.2, 
+                                 tau_add, tau_inbred, tau_mat, tau_epi_sym, tau_epi_asym)
           }
           counter <- counter + 1
           if(use.progress.bar) {
@@ -302,8 +314,10 @@ diallel.gibbs <- function(phenotype,
         }
       }
     }
-    colnames(p.mat) <- c("mu", "female", "inbred penalty", 
-                         add.names, dom.names, mat.names, paste("epi_sym", epi.names, sep=":"), paste("epi_asym", epi.names, sep=":"),
+    colnames(p.mat) <- c("mu", switch(sex.included + 1, NULL, "female"), "inbred penalty", 
+                         add.names, dom.names, mat.names, 
+                         paste("epi_sym", epi.names, sep=":"), 
+                         paste("epi_asym", epi.names, sep=":"),
                          "sigma2", "tau2 add", "tau2 inbred", "tau2 mat", "tau2 epi_sym", "tau2 epi_asym")
     
     # If multiple chains, build up list
