@@ -794,7 +794,8 @@ make.gradient.scale <- function(spectrum = make.spectrum(c("white", "black"), n 
                                 mode = c("horizontal", "vertical"),
                                 utility.type = c("power", "contrasts"),
                                 title.cex = 1.5,
-                                axis.cex = 1.5) {
+                                axis.cex = 1.5,
+                                text.cex = 1.5) {
   mode <- mode[1]
   utility.type <- utility.type[1]
   

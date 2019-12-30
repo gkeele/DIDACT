@@ -4,14 +4,15 @@
 \alias{diallel.gibbs}
 \title{Gibbs sampler that specifies a form of the BayesDiallel model.}
 \usage{
-diallel.gibbs(phenotype, sex, is.female = TRUE, mother.str, father.str,
-  n.iter = 1000, burn.in = 10000, multi.chain = 1, thin = 1,
-  sigma.2.starter = 5, tau_add.starter = 2, tau_inbred.starter = 2,
-  tau_mat.starter = 2, tau_epi_sym.starter = 2,
-  tau_epi_asym.starter = 2, strains.reorder = c("AJ", "B6", "129",
-  "NOD", "NZO", "CAST", "PWK", "WSB"), strains.rename = c("AJ", "B6",
-  "129", "NOD", "NZO", "CAST", "PWK", "WSB"), use.constraint = TRUE,
-  use.progress.bar = TRUE, hyper.ga.alpha = 0.002, hyper.ga.beta = 2)
+diallel.gibbs(phenotype, sex = NULL, is.female = TRUE, mother.str,
+  father.str, n.iter = 1000, burn.in = 10000, multi.chain = 1,
+  thin = 1, sigma.2.starter = 5, tau_add.starter = 2,
+  tau_inbred.starter = 2, tau_mat.starter = 2,
+  tau_epi_sym.starter = 2, tau_epi_asym.starter = 2,
+  strains.reorder = c("AJ", "B6", "129", "NOD", "NZO", "CAST", "PWK",
+  "WSB"), strains.rename = c("AJ", "B6", "129", "NOD", "NZO", "CAST",
+  "PWK", "WSB"), use.constraint = TRUE, use.progress.bar = TRUE,
+  hyper.ga.alpha = 0.002, hyper.ga.beta = 2)
 }
 \arguments{
 \item{phenotype}{Vector of the phenotypes. Expects a quantitative phenotype.}

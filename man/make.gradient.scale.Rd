@@ -6,7 +6,7 @@
 \usage{
 make.gradient.scale(spectrum = make.spectrum(c("white", "black"), n =
   100), mode = c("horizontal", "vertical"), utility.type = c("power",
-  "contrasts"), title.cex = 1.5, axis.cex = 1.5)
+  "contrasts"), title.cex = 1.5, axis.cex = 1.5, text.cex = 1.5)
 }
 \arguments{
 \item{spectrum}{DEFAULT: make.spectrum(c("white", "black"), n = 100). The color spectrum to be used in the gradient.}
